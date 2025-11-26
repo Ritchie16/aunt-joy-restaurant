@@ -17,6 +17,7 @@ A comprehensive restaurant management system built with React.js frontend and PH
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - React.js 18
 - Vite
 - Tailwind CSS
@@ -24,6 +25,7 @@ A comprehensive restaurant management system built with React.js frontend and PH
 - React Router for navigation
 
 ### Backend
+
 - PHP 8.0+
 - MySQL Database
 - JWT Authentication
@@ -44,7 +46,7 @@ Before installation, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Ritchie16/aunt-joy-restaurant.git
 cd aunt-joy-restaurant
 
 2. Backend Setup (PHP)
@@ -155,7 +157,7 @@ After setting up the database, you can log in with the default admin account:
 
     Email: admin@auntjoy.com
 
-    Password: admin123
+    Password: app@1234 or password
 
 Creating Additional Users
 
@@ -213,7 +215,7 @@ aunt-joy-restaurant/
 
 ## 🔒 Environment Security
 
-**Important**: Never commit actual `.env` files to version control. 
+**Important**: Never commit actual `.env` files to version control.
 
 ### For Developers:
 1. Copy `.env.example` to `.env` in both frontend and backend directories
@@ -319,3 +321,4 @@ Backend:
     Test thoroughly
 
     Submit a pull request
+```
