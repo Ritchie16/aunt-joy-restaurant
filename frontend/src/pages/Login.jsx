@@ -192,6 +192,7 @@ const Login = () => {
             </div>
 
             {/* Demo Accounts Hint */}
+            {/*
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h4 className="text-sm font-medium text-blue-800 mb-2">
                 Demo Accounts
@@ -203,6 +204,8 @@ const Login = () => {
                 </p>
               </div>
             </div>
+
+            */}
 
             {/* Submit Button */}
             <div>
