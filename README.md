@@ -1,0 +1,321 @@
+markdown
+
+# 🍽️ Aunt Joy Restaurant Management System
+
+A comprehensive restaurant management system built with React.js frontend and PHP backend API. Features user management, meal ordering, inventory management, and role-based access control.
+
+## 🚀 Features
+
+- **Multi-role System**: Admin, Manager, Sales Personnel, Customer
+- **User Management**: Create, edit, and manage users with different roles
+- **Meal Management**: Add, edit, and manage restaurant meals
+- **Order Management**: Process customer orders
+- **Shopping Cart**: Customer cart functionality
+- **JWT Authentication**: Secure token-based authentication
+- **Responsive Design**: Works on desktop and mobile devices
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React.js 18
+- Vite
+- Tailwind CSS
+- Axios for API calls
+- React Router for navigation
+
+### Backend
+- PHP 8.0+
+- MySQL Database
+- JWT Authentication
+- PHPMailer for emails
+
+## 📋 Prerequisites
+
+Before installation, ensure you have the following installed:
+
+- **PHP 8.0 or higher**
+- **MySQL 5.7 or higher**
+- **Node.js 16 or higher**
+- **Composer** (PHP dependency manager)
+- **Git**
+
+## 🖥️ Installation Guide
+
+### 1. Clone the Repository
+
+```bash
+git clone <your-repository-url>
+cd aunt-joy-restaurant
+
+2. Backend Setup (PHP)
+Linux/macOS:
+bash
+
+# Navigate to backend
+cd backend
+
+# Install PHP dependencies
+composer install
+
+# Create environment file
+cp .env.example .env
+
+# Edit the .env file with your database credentials
+nano .env  # or use your favorite editor
+
+Windows:
+cmd
+
+# Navigate to backend
+cd backend
+
+# Install PHP dependencies
+composer install
+
+# Copy environment file
+copy .env.example .env
+
+# Edit .env file with your database credentials (use Notepad or VS Code)
+notepad .env
+
+Configure Environment (.env):
+env
+
+DB_HOST=127.0.0.1
+DB_NAME=aunt_joy_restaurant
+DB_USER=your_mysql_username
+DB_PASS=your_mysql_password
+
+JWT_SECRET=your_very_secure_jwt_secret_key_change_this
+
+# Optional: Email configuration (comment out if not needed)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=your_email@gmail.com
+# SMTP_PASS=your_app_password
+# SMTP_FROM=your_email@gmail.com
+# SMTP_FROM_NAME=Aunt Joy Restaurant
+
+APP_URL=http://localhost:5173
+API_URL=http://localhost:8000
+APP_ENV=development
+
+3. Database Setup
+Create Database:
+sql
+
+-- Connect to MySQL and run:
+CREATE DATABASE aunt_joy_restaurant;
+
+Import Database Schema:
+bash
+
+# Import the provided SQL file
+mysql -u your_username -p aunt_joy_restaurant < database.sql
+
+Or manually create tables using the SQL commands in database.sql.
+4. Frontend Setup (React)
+Linux/macOS/Windows:
+bash
+
+# Navigate to frontend directory
+cd frontend
+
+# Install Node.js dependencies
+npm install
+
+# Create environment file (if needed)
+cp .env.example .env
+
+5. Start the Development Servers
+Backend Server (PHP):
+bash
+
+# From the backend directory
+cd backend
+
+# Start PHP development server
+php -S localhost:8000
+
+The API will be available at: http://localhost:8000
+Frontend Server (React):
+bash
+
+# From the frontend directory (in a new terminal)
+cd frontend
+
+# Start React development server
+npm run dev
+
+The application will be available at: http://localhost:5173
+🔧 Configuration
+Default Admin Account
+
+After setting up the database, you can log in with the default admin account:
+
+    Email: admin@auntjoy.com
+
+    Password: admin123
+
+Creating Additional Users
+
+    Log in as admin
+
+    Navigate to User Management
+
+    Click "Add User" to create new staff accounts
+
+Email Configuration (Optional)
+
+To enable email sending for staff credentials:
+
+    For Gmail:
+
+        Enable 2-Factor Authentication
+
+        Generate an App Password
+
+        Use the app password in SMTP_PASS
+
+    Update .env:
+    env
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_digit_app_password
+SMTP_FROM=your_email@gmail.com
+SMTP_FROM_NAME=Aunt Joy Restaurant
+
+📁 Project Structure
+text
+
+aunt-joy-restaurant/
+├── backend/
+│   ├── api/                 # API endpoints
+│   ├── config/             # Configuration files
+│   ├── controllers/        # PHP controllers
+│   ├── models/            # Database models
+│   ├── middleware/        # Authentication middleware
+│   ├── utils/             # Utility classes
+│   ├── vendor/            # Composer dependencies
+│   └── index.php          # Main entry point
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── contexts/      # React contexts
+│   │   ├── pages/         # Page components
+│   │   ├── services/      # API services
+│   │   └── utils/         # Utility functions
+│   └── package.json
+└── README.md
+
+
+## 🔒 Environment Security
+
+**Important**: Never commit actual `.env` files to version control. 
+
+### For Developers:
+1. Copy `.env.example` to `.env` in both frontend and backend directories
+2. Fill in your actual values
+3. The `.gitignore` is configured to protect all `.env` files
+
+### Required Environment Files:
+
+project/
+├── backend/
+│ ├── .env.example ✅ (committed)
+│ └── .env ❌ (never commit this!)
+└── frontend/
+├── .env.example ✅ (committed)
+└── .env ❌ (never commit this!)
+text
+
+Complete Security Check
+
+Run this command to verify your environment files are protected:
+bash
+
+# Check what .env files would be committed
+git status --ignored
+
+# Check if any .env files are tracked
+git ls-files | grep .env
+
+# Should only show .env.example files, no .env files
+
+
+👥 User Roles
+
+    Admin: Full system access, user management
+
+    Manager: Meal management, order viewing
+
+    Sales: Order processing, customer management
+
+    Customer: Browse meals, place orders
+
+🐛 Troubleshooting
+Common Issues:
+
+    CORS Errors:
+
+        Ensure backend is running on port 8000
+
+        Check CORS headers in PHP files
+
+    Database Connection Issues:
+
+        Verify MySQL is running
+
+        Check database credentials in .env
+
+        Ensure database exists
+
+    Token Authentication Failures:
+
+        Check JWT_SECRET in .env
+
+        Clear browser localStorage
+
+    Email Not Sending:
+
+        Verify SMTP configuration
+
+        Check if using App Password for Gmail
+
+        Review server logs for SMTP errors
+
+Logs:
+
+    Backend logs: backend/logs/app.log
+
+    Frontend logs: Browser console
+
+🚀 Deployment
+Production Build:
+Frontend:
+bash
+
+cd frontend
+npm run build
+
+Backend:
+
+    Configure web server (Apache/Nginx)
+
+    Set proper file permissions
+
+    Update .env for production values
+
+🤝 Contributing
+
+    Fork the repository
+
+    Create a feature branch
+
+    Make your changes
+
+    Test thoroughly
+
+    Submit a pull request

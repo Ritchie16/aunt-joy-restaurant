@@ -1,0 +1,45 @@
+# Dependencies
+vendor/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files - PROTECT ALL .env FILES IN ALL DIRECTORIES
+.env
+*.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/
+storage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Build directories
+dist/
+build/
+
+# Database
+*.sqlite
+*.db
+
+# Cache
+.cache/
+.parcel-cache/
