@@ -240,13 +240,13 @@ For Developers:
 Required Environment Files:
 text
 
-project/
-├── backend/
-│   ├── .env.example ✅ (committed)
-│   └── .env ❌ (never commit this!)
-└── frontend/
-    ├── .env.example ✅ (committed)
-    └── .env ❌ (never commit this!)
+project/ <br>
+├── backend/ <br>
+│   ├── .env.example ✅ (committed) <br>
+│   └── .env ❌ (never commit this!) <br>
+└── frontend/ <br>
+    ├── .env.example ✅ (committed) <br>
+    └── .env ❌ (never commit this!) <br>
 
 Complete Security Check
 
