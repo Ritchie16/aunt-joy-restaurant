@@ -194,21 +194,21 @@ text
 
 aunt-joy-restaurant/
 ├── backend/
-│   ├── api/                 # API endpoints
-│   ├── config/             # Configuration files
-│   ├── controllers/        # PHP controllers
-│   ├── models/            # Database models
-│   ├── middleware/        # Authentication middleware
-│   ├── utils/             # Utility classes
-│   ├── vendor/            # Composer dependencies
-│   └── index.php          # Main entry point
+│   ├── api/              # API endpoints
+│   ├── config/           # Configuration files
+│   ├── controllers/      # PHP controllers
+│   ├── models/           # Database models
+│   ├── middleware/       # Authentication middleware
+│   ├── utils/            # Utility classes
+│   ├── vendor/           # Composer dependencies
+│   └── index.php         # Main entry point
 ├── frontend/
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── contexts/      # React contexts
-│   │   ├── pages/         # Page components
-│   │   ├── services/      # API services
-│   │   └── utils/         # Utility functions
+│   │   ├── components/   # React components
+│   │   ├── contexts/     # React contexts
+│   │   ├── pages/        # Page components
+│   │   ├── services/     # API services
+│   │   └── utils/        # Utility functions
 │   └── package.json
 └── README.md
 
