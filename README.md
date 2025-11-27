@@ -205,27 +205,26 @@ SMTP_FROM=your_email@gmail.com
 SMTP_FROM_NAME=Aunt Joy Restaurant
 ```
 📁 Project Structure
-text
 
-aunt-joy-restaurant/
-├── backend/
-│   ├── api/                 # API endpoints
-│   ├── config/             # Configuration files
-│   ├── controllers/        # PHP controllers
-│   ├── models/            # Database models
-│   ├── middleware/        # Authentication middleware
-│   ├── utils/             # Utility classes
-│   ├── vendor/            # Composer dependencies
-│   └── index.php          # Main entry point
-├── frontend/
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── contexts/      # React contexts
-│   │   ├── pages/         # Page components
-│   │   ├── services/      # API services
-│   │   └── utils/         # Utility functions
+aunt-joy-restaurant/ <br>
+├── backend/ <br>
+│   ├── api/                 # API endpoints  <br>
+│   ├── config/             # Configuration files <br>
+│   ├── controllers/        # PHP controllers <br>
+│   ├── models/            # Database models <br>
+│   ├── middleware/        # Authentication middleware <br>
+│   ├── utils/             # Utility classes <br>
+│   ├── vendor/            # Composer dependencies <br>
+│   └── index.php          # Main entry point<br>
+├── frontend/<br>
+│   ├── src/<br>
+│   │   ├── components/    # React components<br>
+│   │   ├── contexts/      # React contexts<br>
+│   │   ├── pages/         # Page components<br>
+│   │   ├── services/      # API services <br>
+│   │   └── utils/         # Utility functions<br>
 │   └── package.json
-└── README.md
+└── README.md<br>
 
 🔒 Environment Security
 
