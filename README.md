@@ -64,12 +64,10 @@ cp .env.example .env
 
 # Edit the .env file with your database credentials
 nano .env  # or use your favorite editor
-```
-
 
 Windows:
 cmd
-```bash
+
 # Navigate to backend
 cd backend
 
@@ -81,21 +79,21 @@ copy .env.example .env
 
 # Edit .env file with your database credentials (use Notepad or VS Code)
 notepad .env
-```
+
 Composer Dependencies
 
 The system uses these key PHP packages:
-```bash
+
     phpmailer/phpmailer: For sending email notifications
 
     phpoffice/phpspreadsheet: For Excel report generation
 
     tecnickcom/tcpdf: For PDF document creation
-```
-These are automatically installed when you run ```bash composer install```.
+
+These are automatically installed when you run composer install.
 Configure Environment (.env):
 env
-```bash
+
 DB_HOST=127.0.0.1
 DB_NAME=aunt_joy_restaurant
 DB_USER=your_mysql_username
@@ -114,25 +112,24 @@ JWT_SECRET=your_very_secure_jwt_secret_key_change_this
 APP_URL=http://localhost:5173
 API_URL=http://localhost:8000
 APP_ENV=development
-```
 
 3. Database Setup
 Create Database:
 sql
-```bash
+
 -- Connect to MySQL and run:
 CREATE DATABASE aunt_joy_restaurant;
-```
+
 Import Database Schema:
 bash
-```bash
+
 # Import the provided SQL file
 mysql -u your_username -p aunt_joy_restaurant < database.sql
-```
+
 Or manually create tables using the SQL commands in database.sql.
 4. Frontend Setup (React)
 Linux/macOS/Windows:
-```bash
+bash
 
 # Navigate to frontend directory
 cd frontend
@@ -142,38 +139,37 @@ npm install
 
 # Create environment file (if needed)
 cp .env.example .env
-```
 
 5. Start the Development Servers
 Backend Server (PHP):
-```bash
+bash
 
 # From the backend directory
 cd backend
 
 # Start PHP development server
 php -S localhost:8000 index.php
-```
+
 The API will be available at: http://localhost:8000
 Frontend Server (React):
-```bash
+bash
 
 # From the frontend directory (in a new terminal)
 cd frontend
 
 # Start React development server
 npm run dev
-```
+
 The application will be available at: http://localhost:5173
 🔧 Configuration
 Default Admin Account
 
 After setting up the database, you can log in with the default admin account:
-```bash
+
     Email: admin@auntjoy.com
 
-    Password: admin123 or try password
-```
+    Password: admin123 (or try password)
+
 Creating Additional Users
 
     Log in as admin
@@ -195,15 +191,16 @@ To enable email sending for staff credentials:
         Use the app password in SMTP_PASS
 
     Update .env:
-    env
-```bash
+
+env
+
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_16_digit_app_password
 SMTP_FROM=your_email@gmail.com
 SMTP_FROM_NAME=Aunt Joy Restaurant
-```
+
 📁 Project Structure
 text
 
@@ -252,7 +249,7 @@ project/
 Complete Security Check
 
 Run this command to verify your environment files are protected:
-```bash
+bash
 
 # Check what .env files would be committed
 git status --ignored
@@ -261,7 +258,7 @@ git status --ignored
 git ls-files | grep .env
 
 # Should only show .env.example files, no .env files
-``` 
+
 👥 User Roles
 
     Admin: Full system access, user management, reports
@@ -320,11 +317,11 @@ Logs:
 🚀 Deployment
 Production Build:
 Frontend:
-```bash
+bash
 
 cd frontend
 npm run build
-```
+
 Backend:
 
     Configure web server (Apache/Nginx)
