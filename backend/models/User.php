@@ -190,6 +190,24 @@ class User
     }
 
     /**
+     * activate user
+     */
+    public function activate($id){
+        try {
+            $query = "UPDATE {$this->table} SET is_active = TRUE WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $this->logger->info("User activated: ID {$id}");
+            return true;
+        } catch (PDOException $e) {
+            $this->logger->error("Error activating user ID {$id}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Get users by role
      */
     public function getByRole($role)

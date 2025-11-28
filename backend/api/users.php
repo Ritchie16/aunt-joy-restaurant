@@ -6,7 +6,7 @@
 
 // Set CORS headers
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: http://localhost:5173'); // Changed to 5173
+header('Access-Control-Allow-Origin: http://localhost:5173');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Credentials: true');
@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Load environment FIRST
 require_once __DIR__ . '/../config/Environment.php';
-
 
 // Fix paths
 require_once __DIR__ . '/../controllers/UserController.php';
@@ -58,7 +57,9 @@ try {
             break;
 
         case 'PUT':
-            if (preg_match('/^users\/(\d+)$/', $endpoint, $matches)) {
+            if (preg_match('/^users\/(\d+)\/activate$/', $endpoint, $matches)) {
+                $userController->activateUser($matches[1]);
+            } elseif (preg_match('/^users\/(\d+)$/', $endpoint, $matches)) {
                 $userController->updateUser($matches[1]);
             } else {
                 Response::error('Endpoint not found', [], 404);

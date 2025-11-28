@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Filter, Users, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, Users, Edit, Trash2, UserCheck, UserX } from 'lucide-react';
 import api from '../../services/api';
 import { Logger } from '../../utils/helpers';
 import UserModal from './UserModal';
@@ -27,11 +27,37 @@ const UserManagement = () => {
       Logger.info('Loading users...');
 
       const response = await api.get('/users');
-      if (response.data.success) {
-        setUsers(response.data.data);
-        Logger.info(`Loaded ${response.data.data.length} users`);
+      
+      // Handle corrupted JSON response with warnings
+      let responseData = response.data;
+      
+      // If response.data is a string (due to PHP warnings), try to extract JSON
+      if (typeof responseData === 'string') {
+        console.log('🔍 [DEBUG] Response is string, extracting JSON...');
+        
+        // Try to find JSON in the string
+        const jsonMatch = responseData.match(/\{.*\}/s);
+        if (jsonMatch) {
+          try {
+            responseData = JSON.parse(jsonMatch[0]);
+            console.log('🔍 [DEBUG] Extracted JSON:', responseData);
+          } catch (parseError) {
+            console.error('🔍 [DEBUG] Failed to parse JSON:', parseError);
+          }
+        }
+      }
+      
+      // Now check the actual data structure
+      if (responseData && responseData.success) {
+        console.log('🔍 [DEBUG] Setting users with data:', responseData.data);
+        setUsers(responseData.data);
+        Logger.info(`Loaded ${responseData.data.length} users`);
+      } else {
+        console.log('🔍 [DEBUG] API call failed or invalid structure:', responseData);
+        setError(responseData?.message || 'API call failed');
       }
     } catch (error) {
+      console.error('🔍 [DEBUG] Error loading users:', error);
       const errorMsg = error.message || 'Failed to load users';
       setError(errorMsg);
       Logger.error('Error loading users:', error);
@@ -90,21 +116,41 @@ const UserManagement = () => {
   };
 
   /**
-   * Handle delete user
+   * Handle deactivate user (soft delete)
    */
-  const handleDeleteUser = async (user) => {
-    if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
+  const handleDeactivateUser = async (user) => {
+    if (window.confirm(`Are you sure you want to deactivate ${user.name}? They will not be able to log in.`)) {
       try {
-        Logger.info(`Deleting user: ${user.email}`);
+        Logger.info(`Deactivating user: ${user.email}`);
         
         const response = await api.delete(`/users/${user.id}`);
         if (response.data.success) {
-          Logger.info(`User deleted successfully: ${user.email}`);
+          Logger.info(`User deactivated successfully: ${user.email}`);
           loadUsers(); // Reload users
         }
       } catch (error) {
-        Logger.error('Error deleting user:', error);
-        alert('Failed to delete user: ' + error.message);
+        Logger.error('Error deactivating user:', error);
+        alert('Failed to deactivate user: ' + error.message);
+      }
+    }
+  };
+
+  /**
+   * Handle activate user
+   */
+  const handleActivateUser = async (user) => {
+    if (window.confirm(`Are you sure you want to activate ${user.name}? They will be able to log in again.`)) {
+      try {
+        Logger.info(`Activating user: ${user.email}`);
+        
+        const response = await api.put(`/users/${user.id}/activate`);
+        if (response.data.success) {
+          Logger.info(`User activated successfully: ${user.email}`);
+          loadUsers(); // Reload users
+        }
+      } catch (error) {
+        Logger.error('Error activating user:', error);
+        alert('Failed to activate user: ' + error.message);
       }
     }
   };
@@ -216,6 +262,22 @@ const UserManagement = () => {
               </select>
             </div>
           </div>
+
+          {/* Status Filter */}
+          <div className="md:w-48">
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -268,7 +330,7 @@ const UserManagement = () => {
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {user.is_active ? 'Active' : 'Inactive'}
+                        {user.is_active ? 'Active' : 'Deactivated'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -283,14 +345,25 @@ const UserManagement = () => {
                         >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => handleDeleteUser(user)}
-                          className="text-red-600 hover:text-red-900 p-1 transition-colors"
-                          title="Delete user"
-                          disabled={user.role === 'admin'} // Prevent deleting admin users
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        
+                        {user.is_active ? (
+                          <button
+                            onClick={() => handleDeactivateUser(user)}
+                            className="text-orange-600 hover:text-orange-900 p-1 transition-colors"
+                            title="Deactivate user"
+                            disabled={user.role === 'admin'} // Prevent deactivating admin users
+                          >
+                            <UserX className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleActivateUser(user)}
+                            className="text-green-600 hover:text-green-900 p-1 transition-colors"
+                            title="Activate user"
+                          >
+                            <UserCheck className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

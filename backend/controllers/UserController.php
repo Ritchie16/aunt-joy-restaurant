@@ -206,6 +206,32 @@ class UserController
         }
     }
 
+
+    /**
+     * activate user
+     */
+    public function activateUser($id){
+        try {
+            $this->logger->info("Activating user ID: {$id}");
+
+            // Check authentication and admin role
+            $admin = $this->authenticateAdmin();
+            if (!$admin) return;
+
+            $success = $this->userModel->activate($id);
+            if (!$success) {
+                Response::error('Failed to activate user');
+                return;
+            }
+
+            $this->logger->info("User activated successfully: ID {$id}");
+            Response::success('User activated successfully');
+        } catch (Exception $e) {
+            $this->logger->error("Error in activateUser: " . $e->getMessage());
+            Response::error('Server error: ' . $e->getMessage(), [], 500);
+        }
+    }
+
     /**
      * Get users by role
      */

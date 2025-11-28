@@ -1,4 +1,3 @@
-//src/services/api.js
 import axios from "axios";
 import { Logger } from "../utils/helpers";
 
@@ -40,9 +39,23 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
+// Response interceptor to handle PHP warnings and error handling
 api.interceptors.response.use(
   (response) => {
+    // Handle PHP warnings that corrupt JSON
+    if (typeof response.data === "string") {
+      try {
+        // Try to extract JSON from the string
+        const jsonMatch = response.data.match(/\{.*\}/s);
+        if (jsonMatch) {
+          response.data = JSON.parse(jsonMatch[0]);
+          Logger.debug("API Response: Extracted JSON from corrupted response");
+        }
+      } catch (error) {
+        Logger.error("API Response: Failed to parse corrupted JSON", error);
+      }
+    }
+
     Logger.debug(
       `API Response: ${response.status} ${response.config.url}`,
       response.data
