@@ -1,7 +1,7 @@
 // src/components/admin/UserModal.jsx
 import React, { useState, useEffect } from 'react';
-import { X, Mail, User, Phone, MapPin, Key, Loader } from 'lucide-react';
-import  api  from '../../services/api';
+import { X, Mail, User, Phone, MapPin, Key, Loader, CheckCircle } from 'lucide-react';
+import api from '../../services/api';
 import { Logger } from '../../utils/helpers';
 import Modal from '../common/Modal';
 
@@ -19,6 +19,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Initialize form when modal opens or user changes
   useEffect(() => {
@@ -45,6 +47,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         setPassword(''); // Password will be generated
       }
       setErrors({});
+      setIsSuccess(false);
+      setSuccessMessage('');
     }
   }, [isOpen, user]);
 
@@ -101,6 +105,21 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
   };
 
   /**
+   * Handle successful submission
+   */
+  const handleSuccess = (message) => {
+    setIsSuccess(true);
+    setSuccessMessage(message);
+    
+    // Close modal after 2 seconds and refresh user list
+    setTimeout(() => {
+      setIsSuccess(false);
+      onSave(); // This should refresh the user list
+      onClose(); // Close the modal
+    }, 2000);
+  };
+
+  /**
    * Handle form submission
    */
   const handleSubmit = async (e) => {
@@ -123,14 +142,17 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         const response = await api.put(`/users/${user.id}`, formData);
         if (response.data.success) {
           Logger.info(`User updated successfully: ${formData.email}`);
-          onSave();
+          handleSuccess('User updated successfully!');
         }
       } else {
         // Create new user
         const response = await api.post('/users', formData);
         if (response.data.success) {
           Logger.info(`User created successfully: ${formData.email}`);
-          onSave();
+          const message = formData.role !== 'customer' 
+            ? 'User created successfully! Credentials have been sent to their email.'
+            : 'User created successfully!';
+          handleSuccess(message);
         }
       }
     } catch (error) {
@@ -154,201 +176,230 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
     setPassword(password);
   };
 
+  /**
+   * Reset form and close modal
+   */
+  const handleClose = () => {
+    setFormData({
+      name: '',
+      email: '',
+      role: 'customer',
+      phone: '',
+      address: ''
+    });
+    setErrors({});
+    setIsSuccess(false);
+    setSuccessMessage('');
+    onClose();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={user ? 'Edit User' : 'Create New User'}
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name Field */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-            <User className="h-4 w-4 inline mr-1" />
-            Full Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-              errors.name ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Enter full name"
-            disabled={isSubmitting}
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-          )}
-        </div>
-
-        {/* Email Field */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            <Mail className="h-4 w-4 inline mr-1" />
-            Email Address *
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-              errors.email ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Enter email address"
-            disabled={isSubmitting || user} // Can't change email when editing
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-          )}
-        </div>
-
-        {/* Role Field */}
-        <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-            Role *
-          </label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-              errors.role ? 'border-red-300' : 'border-gray-300'
-            }`}
-            disabled={isSubmitting}
-          >
-            <option value="customer">Customer</option>
-            <option value="sales">Sales Personnel</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Administrator</option>
-          </select>
-          {errors.role && (
-            <p className="mt-1 text-sm text-red-600">{errors.role}</p>
-          )}
-        </div>
-
-        {/* Phone Field */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-            <Phone className="h-4 w-4 inline mr-1" />
-            Phone Number {formData.role !== 'customer' && '*'}
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-              errors.phone ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Enter phone number"
-            disabled={isSubmitting}
-          />
-          {errors.phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-          )}
-        </div>
-
-        {/* Address Field */}
-        <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-            <MapPin className="h-4 w-4 inline mr-1" />
-            Address {formData.role !== 'customer' && '*'}
-          </label>
-          <textarea
-            id="address"
-            name="address"
-            rows={3}
-            value={formData.address}
-            onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-              errors.address ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Enter address"
-            disabled={isSubmitting}
-          />
-          {errors.address && (
-            <p className="mt-1 text-sm text-red-600">{errors.address}</p>
-          )}
-        </div>
-
-        {/* Password Information for New Users */}
-        {!user && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-blue-800 flex items-center">
-                <Key className="h-4 w-4 mr-1" />
-                Password Information
-              </span>
-              <button
-                type="button"
-                onClick={generatePassword}
-                className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
-              >
-                Generate
-              </button>
-            </div>
-            <p className="text-sm text-blue-700">
-              A secure random password will be generated and sent to the user's email.
-              {password && (
-                <span className="font-mono block mt-1 bg-blue-100 p-2 rounded">
-                  Generated: {password}
-                </span>
-              )}
-            </p>
+      {isSuccess ? (
+        <div className="text-center py-8">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Success!</h3>
+          <p className="text-gray-600 mb-4">{successMessage}</p>
+          <div className="animate-pulse text-sm text-gray-500">
+            Closing automatically...
           </div>
-        )}
-
-        {/* Staff Role Notice */}
-        {formData.role !== 'customer' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-yellow-800">
-              <strong>Note:</strong> For {formData.role} roles, login credentials will be 
-              automatically sent to the provided email address.
-            </p>
-          </div>
-        )}
-
-        {/* Submit Error */}
-        {errors.submit && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-red-700">{errors.submit}</p>
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader className="h-4 w-4 animate-spin" />
-                <span>{user ? 'Updating...' : 'Creating...'}</span>
-              </>
-            ) : (
-              <span>{user ? 'Update User' : 'Create User'}</span>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name Field */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <User className="h-4 w-4 inline mr-1" />
+              Full Name *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                errors.name ? 'border-red-300' : 'border-gray-300'
+              }`}
+              placeholder="Enter full name"
+              disabled={isSubmitting}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
             )}
-          </button>
-        </div>
-      </form>
+          </div>
+
+          {/* Email Field */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <Mail className="h-4 w-4 inline mr-1" />
+              Email Address *
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                errors.email ? 'border-red-300' : 'border-gray-300'
+              }`}
+              placeholder="Enter email address"
+              disabled={isSubmitting || user} // Can't change email when editing
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Role Field */}
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+              Role *
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                errors.role ? 'border-red-300' : 'border-gray-300'
+              }`}
+              disabled={isSubmitting}
+            >
+              <option value="customer">Customer</option>
+              <option value="sales">Sales Personnel</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Administrator</option>
+            </select>
+            {errors.role && (
+              <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+            )}
+          </div>
+
+          {/* Phone Field */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <Phone className="h-4 w-4 inline mr-1" />
+              Phone Number {formData.role !== 'customer' && '*'}
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                errors.phone ? 'border-red-300' : 'border-gray-300'
+              }`}
+              placeholder="Enter phone number"
+              disabled={isSubmitting}
+            />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Address Field */}
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+              <MapPin className="h-4 w-4 inline mr-1" />
+              Address {formData.role !== 'customer' && '*'}
+            </label>
+            <textarea
+              id="address"
+              name="address"
+              rows={3}
+              value={formData.address}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                errors.address ? 'border-red-300' : 'border-gray-300'
+              }`}
+              placeholder="Enter address"
+              disabled={isSubmitting}
+            />
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+            )}
+          </div>
+
+          {/* Password Information for New Users */}
+          {!user && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-800 flex items-center">
+                  <Key className="h-4 w-4 mr-1" />
+                  Password Information
+                </span>
+                <button
+                  type="button"
+                  onClick={generatePassword}
+                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                  disabled={isSubmitting}
+                >
+                  Generate
+                </button>
+              </div>
+              <p className="text-sm text-blue-700">
+                A secure random password will be generated and sent to the user's email.
+                {password && (
+                  <span className="font-mono block mt-1 bg-blue-100 p-2 rounded">
+                    Generated: {password}
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
+
+          {/* Staff Role Notice */}
+          {formData.role !== 'customer' && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> For {formData.role} roles, login credentials will be 
+                automatically sent to the provided email address.
+              </p>
+            </div>
+          )}
+
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-700">{errors.submit}</p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin" />
+                  <span>{user ? 'Updating...' : 'Creating...'}</span>
+                </>
+              ) : (
+                <span>{user ? 'Update User' : 'Create User'}</span>
+              )}
+            </button>
+          </div>
+        </form>
+      )}
     </Modal>
   );
 };
