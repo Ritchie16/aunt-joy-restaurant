@@ -26,11 +26,11 @@ class Order {
         try {
             // Insert order
             $query = "
-                INSERT INTO {$this->table} 
-                (customer_id, order_number, total_amount, delivery_address, customer_phone, special_instructions) 
+                INSERT INTO {$this->table}
+                (customer_id, order_number, total_amount, delivery_address, customer_phone, special_instructions)
                 VALUES (:customer_id, :order_number, :total_amount, :delivery_address, :customer_phone, :special_instructions)
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->execute($orderData);
             $orderId = $this->conn->lastInsertId();
@@ -38,11 +38,11 @@ class Order {
             // Insert order items
             foreach ($items as $item) {
                 $itemQuery = "
-                    INSERT INTO {$this->itemsTable} 
-                    (order_id, meal_id, quantity, unit_price, total_price) 
+                    INSERT INTO {$this->itemsTable}
+                    (order_id, meal_id, quantity, unit_price, total_price)
                     VALUES (:order_id, :meal_id, :quantity, :unit_price, :total_price)
                 ";
-                
+
                 $itemStmt = $this->conn->prepare($itemQuery);
                 $itemStmt->execute([
                     'order_id' => $orderId,
@@ -70,7 +70,7 @@ class Order {
     public function getByCustomerId($customerId) {
         try {
             $query = "
-                SELECT o.*, 
+                SELECT o.*,
                        COUNT(oi.id) as item_count,
                        SUM(oi.quantity) as total_quantity
                 FROM {$this->table} o
@@ -79,14 +79,14 @@ class Order {
                 GROUP BY o.id
                 ORDER BY o.created_at DESC
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':customer_id', $customerId);
             $stmt->execute();
 
             $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $this->logger->debug("Retrieved " . count($orders) . " orders for customer ID: {$customerId}");
-            
+
             return $orders;
 
         } catch (PDOException $e) {
@@ -101,7 +101,7 @@ class Order {
     public function getAllWithDetails() {
         try {
             $query = "
-                SELECT o.*, 
+                SELECT o.*,
                        u.name as customer_name,
                        u.email as customer_email,
                        u.phone as customer_phone,
@@ -113,13 +113,13 @@ class Order {
                 GROUP BY o.id
                 ORDER BY o.created_at DESC
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
 
             $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $this->logger->debug("Retrieved " . count($orders) . " orders with details");
-            
+
             return $orders;
 
         } catch (PDOException $e) {
@@ -140,7 +140,7 @@ class Order {
                 LEFT JOIN users u ON o.customer_id = u.id
                 WHERE o.id = :order_id
             ";
-            
+
             $orderStmt = $this->conn->prepare($orderQuery);
             $orderStmt->bindParam(':order_id', $orderId);
             $orderStmt->execute();
@@ -157,7 +157,7 @@ class Order {
                 LEFT JOIN meals m ON oi.meal_id = m.id
                 WHERE oi.order_id = :order_id
             ";
-            
+
             $itemsStmt = $this->conn->prepare($itemsQuery);
             $itemsStmt->bindParam(':order_id', $orderId);
             $itemsStmt->execute();
@@ -165,7 +165,7 @@ class Order {
 
             $order['items'] = $items;
             $this->logger->debug("Retrieved full details for order ID: {$orderId}");
-            
+
             return $order;
 
         } catch (PDOException $e) {
@@ -206,14 +206,14 @@ class Order {
                 WHERE o.status = :status
                 ORDER BY o.created_at ASC
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':status', $status);
             $stmt->execute();
 
             $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $this->logger->debug("Retrieved " . count($orders) . " orders with status: {$status}");
-            
+
             return $orders;
 
         } catch (PDOException $e) {

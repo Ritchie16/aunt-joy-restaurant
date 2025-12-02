@@ -151,19 +151,19 @@ class EmailService
                 <div class='content'>
                     <p>Hello <strong>{$name}</strong>,</p>
                     <p>Your {$role} account has been created successfully at Aunt Joy Restaurant.</p>
-                    
+
                     <div class='credentials'>
                         <p><strong>📧 Email:</strong> {$email}</p>
                         <p><strong>🔑 Password:</strong> {$password}</p>
                         <p><strong>👤 Role:</strong> " . ucfirst($role) . "</p>
                     </div>
-                    
+
                     <div class='warning'>
                         <p><strong>⚠️ Important:</strong> For security reasons, please change your password immediately after logging in.</p>
                     </div>
-                    
+
                     <p><strong>🔗 Login URL:</strong> <a href='{$appUrl}/login'>{$appUrl}/login</a></p>
-                    
+
                     <p>Best regards,<br>The Aunt Joy Restaurant Team</p>
                 </div>
             </div>

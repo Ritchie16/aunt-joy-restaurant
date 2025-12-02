@@ -27,7 +27,7 @@ class OrderController {
     public function createOrder() {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
             $this->logger->info("Creating new order for customer");
 
             // Authenticate customer
@@ -85,7 +85,7 @@ class OrderController {
             if (!$customer) return;
 
             $orders = $this->orderModel->getByCustomerId($customer['user_id']);
-            
+
             if ($orders === false) {
                 Response::error('Failed to retrieve orders');
                 return;
@@ -112,7 +112,7 @@ class OrderController {
             if (!$staff) return;
 
             $orders = $this->orderModel->getAllWithDetails();
-            
+
             if ($orders === false) {
                 Response::error('Failed to retrieve orders');
                 return;
@@ -133,7 +133,7 @@ class OrderController {
     public function updateOrderStatus($orderId) {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
             $this->logger->info("Updating order status for ID: {$orderId}");
 
             // Authenticate sales personnel
@@ -175,7 +175,7 @@ class OrderController {
             if (!$user) return;
 
             $order = $this->orderModel->getByIdWithDetails($orderId);
-            
+
             if (!$order) {
                 Response::error('Order not found');
                 return;
@@ -223,7 +223,7 @@ class OrderController {
     private function authenticateUser($allowedRoles = []) {
         $headers = getallheaders();
         $authHeader = $headers['Authorization'] ?? '';
-        
+
         if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
             Response::error('Authentication required', [], 401);
             return false;
@@ -231,7 +231,7 @@ class OrderController {
 
         $token = $matches[1];
         $payload = AuthController::verifyToken($token);
-        
+
         if (!$payload) {
             Response::error('Invalid or expired token', [], 401);
             return false;

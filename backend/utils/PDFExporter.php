@@ -43,7 +43,7 @@ if (class_exists('TCPDF')) {
                 $pdf->SetFont('helvetica', '', 12);
                 $pdf->Cell(0, 10, 'Period: ' . $reportData['metadata']['period'], 0, 1, 'C');
                 $pdf->Cell(0, 10, 'Generated: ' . $reportData['metadata']['generated_at'], 0, 1, 'C');
-                
+
                 // Add some space
                 $pdf->Ln(10);
 
@@ -114,11 +114,11 @@ if (class_exists('TCPDF')) {
          */
         public function exportSalesReport($reportData) {
             $this->logger->warning("TCPDF not available, using fallback PDF export");
-            
+
             // Instead of PDF, return JSON data
             header('Content-Type: application/json');
             header('Content-Disposition: attachment; filename="sales-report-' . $reportData['metadata']['period'] . '.json"');
-            
+
             echo json_encode([
                 'success' => true,
                 'message' => 'PDF export not available. Here is the report data in JSON format.',

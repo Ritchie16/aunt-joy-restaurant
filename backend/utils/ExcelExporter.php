@@ -95,12 +95,12 @@ if (class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
 
                 // Create Excel file
                 $writer = new Xlsx($spreadsheet);
-                
+
                 // Output to browser
                 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 header('Content-Disposition: attachment;filename="sales-report-' . $reportData['metadata']['period'] . '.xlsx"');
                 header('Cache-Control: max-age=0');
-                
+
                 $writer->save('php://output');
                 $this->logger->info("Excel report exported successfully");
 
@@ -124,19 +124,19 @@ if (class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
          */
         public function exportSalesReport($reportData) {
             $this->logger->warning("PhpSpreadsheet not available, using fallback Excel export");
-            
+
             // Instead of Excel, return CSV data
             header('Content-Type: text/csv');
             header('Content-Disposition: attachment; filename="sales-report-' . $reportData['metadata']['period'] . '.csv"');
-            
+
             $output = fopen('php://output', 'w');
-            
+
             // Write header
             fputcsv($output, ['Aunt Joy Restaurant - Sales Report']);
             fputcsv($output, ['Period:', $reportData['metadata']['period']]);
             fputcsv($output, ['Generated:', $reportData['metadata']['generated_at']]);
             fputcsv($output, []); // Empty line
-            
+
             // Write key metrics
             fputcsv($output, ['Key Metrics']);
             fputcsv($output, ['Total Revenue', 'MK ' . number_format($reportData['total_revenue'], 2)]);
@@ -144,12 +144,12 @@ if (class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
             fputcsv($output, ['Average Order Value', 'MK ' . number_format($reportData['average_order_value'], 2)]);
             fputcsv($output, ['Active Customers', $reportData['active_customers']]);
             fputcsv($output, []); // Empty line
-            
+
             // Write top selling items
             if (!empty($reportData['top_selling_items'])) {
                 fputcsv($output, ['Top Selling Items']);
                 fputcsv($output, ['Meal Name', 'Quantity', 'Revenue']);
-                
+
                 foreach ($reportData['top_selling_items'] as $item) {
                     fputcsv($output, [
                         $item['meal_name'],
@@ -158,7 +158,7 @@ if (class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
                     ]);
                 }
             }
-            
+
             fclose($output);
             exit;
         }

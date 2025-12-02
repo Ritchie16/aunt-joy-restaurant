@@ -33,7 +33,7 @@ class RoleMiddleware {
         }
 
         $hasAccess = in_array($userRole, $roleHierarchy[$requiredRole]);
-        
+
         if (!$hasAccess) {
             $this->logger->warning("RoleMiddleware: Access denied - {$userRole} cannot access {$requiredRole} resources");
         } else {

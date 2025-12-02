@@ -47,7 +47,7 @@ class ReportController {
             }
 
             $report = $this->reportModel->generateSalesReport($month, $year);
-            
+
             if ($report === false) {
                 Response::error('Failed to generate report');
                 return;
@@ -151,7 +151,7 @@ class ReportController {
             $endDate = $_GET['end_date'] ?? date('Y-m-t');
 
             $summary = $this->reportModel->generateFinancialSummary($startDate, $endDate);
-            
+
             if ($summary === false) {
                 Response::error('Failed to generate financial summary');
                 return;
@@ -179,7 +179,7 @@ class ReportController {
 
             $limit = $_GET['limit'] ?? 5;
             $categories = $this->reportModel->getPopularCategories($limit);
-            
+
             if ($categories === false) {
                 Response::error('Failed to retrieve popular categories');
                 return;
@@ -210,7 +210,7 @@ class ReportController {
             // - Repeat customer rate
             // - Customer lifetime value
             // - etc.
-            
+
             $insights = [
                 'new_customers_this_month' => 0,
                 'repeat_customer_rate' => '0%',

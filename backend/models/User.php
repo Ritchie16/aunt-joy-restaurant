@@ -52,7 +52,7 @@ class User
     public function findById($id)
     {
         try {
-            $query = "SELECT id, name, email, role, phone, address, is_active, created_at 
+            $query = "SELECT id, name, email, role, phone, address, is_active, created_at
                       FROM {$this->table} WHERE id = :id AND is_active = TRUE";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
@@ -79,8 +79,8 @@ class User
     public function create($data)
     {
         try {
-            $query = "INSERT INTO {$this->table} 
-                     (name, email, password, role, phone, address) 
+            $query = "INSERT INTO {$this->table}
+                     (name, email, password, role, phone, address)
                      VALUES (:name, :email, :password, :role, :phone, :address)";
 
             $stmt = $this->conn->prepare($query);
@@ -110,7 +110,7 @@ class User
     public function getAll($role = null)
     {
         try {
-            $query = "SELECT id, name, email, role, phone, address, is_active, created_at 
+            $query = "SELECT id, name, email, role, phone, address, is_active, created_at
                       FROM {$this->table} WHERE 1=1";
 
             if ($role) {
@@ -213,9 +213,9 @@ class User
     public function getByRole($role)
     {
         try {
-            $query = "SELECT id, name, email, phone, address, created_at 
-                      FROM {$this->table} 
-                      WHERE role = :role AND is_active = TRUE 
+            $query = "SELECT id, name, email, phone, address, created_at
+                      FROM {$this->table}
+                      WHERE role = :role AND is_active = TRUE
                       ORDER BY name";
 
             $stmt = $this->conn->prepare($query);

@@ -35,16 +35,16 @@ class Report {
 
             // Total Revenue and Orders
             $revenueQuery = "
-                SELECT 
+                SELECT
                     COUNT(*) as total_orders,
                     COALESCE(SUM(total_amount), 0) as total_revenue,
                     COALESCE(AVG(total_amount), 0) as average_order_value
-                FROM orders 
-                WHERE MONTH(created_at) = :month 
+                FROM orders
+                WHERE MONTH(created_at) = :month
                 AND YEAR(created_at) = :year
                 AND status != 'cancelled'
             ";
-            
+
             $stmt = $this->conn->prepare($revenueQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $revenueData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -56,11 +56,11 @@ class Report {
             // Active Customers (customers who placed orders in the period)
             $customersQuery = "
                 SELECT COUNT(DISTINCT customer_id) as active_customers
-                FROM orders 
-                WHERE MONTH(created_at) = :month 
+                FROM orders
+                WHERE MONTH(created_at) = :month
                 AND YEAR(created_at) = :year
             ";
-            
+
             $stmt = $this->conn->prepare($customersQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $customersData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -68,7 +68,7 @@ class Report {
 
             // Top Selling Items
             $topItemsQuery = "
-                SELECT 
+                SELECT
                     m.id as meal_id,
                     m.name as meal_name,
                     SUM(oi.quantity) as total_quantity,
@@ -76,32 +76,32 @@ class Report {
                 FROM order_items oi
                 JOIN meals m ON oi.meal_id = m.id
                 JOIN orders o ON oi.order_id = o.id
-                WHERE MONTH(o.created_at) = :month 
+                WHERE MONTH(o.created_at) = :month
                 AND YEAR(o.created_at) = :year
                 AND o.status != 'cancelled'
                 GROUP BY m.id, m.name
                 ORDER BY total_quantity DESC
                 LIMIT 10
             ";
-            
+
             $stmt = $this->conn->prepare($topItemsQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $report['top_selling_items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Daily Sales
             $dailySalesQuery = "
-                SELECT 
+                SELECT
                     DATE(created_at) as date,
                     COUNT(*) as order_count,
                     COALESCE(SUM(total_amount), 0) as revenue
-                FROM orders 
-                WHERE MONTH(created_at) = :month 
+                FROM orders
+                WHERE MONTH(created_at) = :month
                 AND YEAR(created_at) = :year
                 AND status != 'cancelled'
                 GROUP BY DATE(created_at)
                 ORDER BY date
             ";
-            
+
             $stmt = $this->conn->prepare($dailySalesQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $report['daily_sales'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -117,19 +117,19 @@ class Report {
 
             // Order Status Distribution
             $statusQuery = "
-                SELECT 
+                SELECT
                     status,
                     COUNT(*) as count
-                FROM orders 
-                WHERE MONTH(created_at) = :month 
+                FROM orders
+                WHERE MONTH(created_at) = :month
                 AND YEAR(created_at) = :year
                 GROUP BY status
             ";
-            
+
             $stmt = $this->conn->prepare($statusQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $statusData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             $statusDistribution = [];
             foreach ($statusData as $status) {
                 $statusDistribution[$status['status']] = (int)$status['count'];
@@ -138,7 +138,7 @@ class Report {
 
             // Revenue by Category
             $categoryRevenueQuery = "
-                SELECT 
+                SELECT
                     c.id as category_id,
                     c.name as category_name,
                     COALESCE(SUM(oi.total_price), 0) as total_revenue
@@ -146,13 +146,13 @@ class Report {
                 LEFT JOIN meals m ON c.id = m.category_id
                 LEFT JOIN order_items oi ON m.id = oi.meal_id
                 LEFT JOIN orders o ON oi.order_id = o.id
-                AND MONTH(o.created_at) = :month 
+                AND MONTH(o.created_at) = :month
                 AND YEAR(o.created_at) = :year
                 AND o.status != 'cancelled'
                 GROUP BY c.id, c.name
                 ORDER BY total_revenue DESC
             ";
-            
+
             $stmt = $this->conn->prepare($categoryRevenueQuery);
             $stmt->execute(['month' => $month, 'year' => $year]);
             $report['revenue_by_category'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -174,16 +174,16 @@ class Report {
             $this->logger->info("Generating financial summary from {$startDate} to {$endDate}");
 
             $query = "
-                SELECT 
+                SELECT
                     COUNT(*) as total_orders,
                     COALESCE(SUM(total_amount), 0) as total_revenue,
                     COALESCE(AVG(total_amount), 0) as average_order_value,
                     COUNT(DISTINCT customer_id) as unique_customers
-                FROM orders 
+                FROM orders
                 WHERE created_at BETWEEN :start_date AND :end_date
                 AND status != 'cancelled'
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
                 'start_date' => $startDate,
@@ -192,7 +192,7 @@ class Report {
 
             $summary = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->logger->info("Financial summary generated successfully");
-            
+
             return $summary;
 
         } catch (PDOException $e) {
@@ -209,7 +209,7 @@ class Report {
             $this->logger->info("Generating order history for customer: {$customerId}");
 
             $query = "
-                SELECT 
+                SELECT
                     o.*,
                     COUNT(oi.id) as item_count,
                     SUM(oi.quantity) as total_quantity
@@ -219,7 +219,7 @@ class Report {
                 GROUP BY o.id
                 ORDER BY o.created_at DESC
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->execute(['customer_id' => $customerId]);
             $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -241,7 +241,7 @@ class Report {
             $this->logger->info("Getting popular categories");
 
             $query = "
-                SELECT 
+                SELECT
                     c.name as category_name,
                     COUNT(oi.id) as order_count,
                     SUM(oi.quantity) as total_quantity,
@@ -255,7 +255,7 @@ class Report {
                 ORDER BY total_revenue DESC
                 LIMIT :limit
             ";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
             $stmt->execute();

@@ -46,7 +46,7 @@ if (strpos($path, '/api/') === 0) {
         case $api_path === '/users' && $_SERVER['REQUEST_METHOD'] === 'POST':
             require __DIR__ . '/api/users.php';
             break;
-       
+
         case preg_match('#^/users/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'PUT':
             require __DIR__ . '/api/users.php';
             break;

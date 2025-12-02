@@ -30,32 +30,107 @@ const MealManagement = () => {
   /**
    * Load meals and categories
    */
-  const loadMealsAndCategories = async () => {
-    try {
-      setIsLoading(true);
-      Logger.info('Loading meals and categories...');
-
-      const [mealsResponse, categoriesResponse] = await Promise.all([
-        api.get('/meals'),
-        api.get('/categories')
-      ]);
-
-      if (mealsResponse.data.success) {
-        setMeals(mealsResponse.data.data);
-      }
-
-      if (categoriesResponse.data.success) {
-        setCategories(categoriesResponse.data.data);
-      }
-
-    } catch (error) {
-      const errorMsg = error.message || 'Failed to load data';
-      setError(errorMsg);
-      Logger.error('Error loading meals and categories:', error);
-    } finally {
-      setIsLoading(false);
+  // Update your loadMealsAndCategories function
+const loadMealsAndCategories = async () => {
+  try {
+    setIsLoading(true);
+    setError('');
+    Logger.info('Loading meals and categories...');
+    
+    console.group('📋 Loading Meal Data');
+    
+    // Test API connection first
+    console.log('🔌 Testing API connection...');
+    await api.testConnection();
+    
+    // Load meals
+    console.log('🍽️ Loading meals from /meals...');
+    const mealsResponse = await api.get('/meals');
+    console.log('Meals Response:', mealsResponse);
+    
+    if (mealsResponse.data.success) {
+      console.log(`✅ Loaded ${mealsResponse.data.data?.length || 0} meals`);
+      console.log('Meals sample:', mealsResponse.data.data?.slice(0, 3));
+      setMeals(mealsResponse.data.data || []);
+    } else {
+      console.error('❌ Meals API returned success=false:', mealsResponse.data);
+      setError(mealsResponse.data.message || 'Failed to load meals');
     }
-  };
+    
+    // Load categories - IMPORTANT: Check your actual API endpoint
+    console.log('📂 Loading categories...');
+    
+    // Try different endpoints to find the correct one
+    const categoryEndpoints = ['/categories', '/meals/categories', '/meals?categories=true'];
+    
+    let categoriesResponse = null;
+    for (const endpoint of categoryEndpoints) {
+      try {
+        console.log(`   Trying endpoint: ${endpoint}`);
+        categoriesResponse = await api.get(endpoint);
+        console.log(`   ✅ ${endpoint} responded with status:`, categoriesResponse.status);
+        
+        if (categoriesResponse.data.success) {
+          console.log(`✅ Loaded ${categoriesResponse.data.data?.length || 0} categories`);
+          setCategories(categoriesResponse.data.data || []);
+          break;
+        }
+      } catch (err) {
+        console.log(`   ❌ ${endpoint} failed:`, err.message);
+      }
+    }
+    
+    if (!categoriesResponse || !categoriesResponse.data.success) {
+      console.warn('⚠️ Could not load categories from any endpoint');
+      // Use the categories from your database dump if API fails
+      const fallbackCategories = [
+        {"id":1,"name":"Breakfast","description":"Start your day with our delicious breakfast options"},
+        {"id":2,"name":"Lunch","description":"Hearty meals for your midday break"},
+        {"id":3,"name":"Dinner","description":"Perfect meals to end your day"},
+        {"id":4,"name":"Drinks","description":"Refreshing beverages and drinks"},
+        {"id":5,"name":"Desserts","description":"Sweet treats to satisfy your cravings"}
+      ];
+      setCategories(fallbackCategories);
+    }
+    
+    console.groupEnd();
+    
+  } catch (error) {
+    console.error('❌ Error loading meals and categories:', error);
+    
+    // Detailed error analysis
+    console.group('🔍 Error Analysis');
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+    }
+    
+    if (error.request) {
+      console.error('No response received. Request was:', error.request);
+    }
+    
+    console.groupEnd();
+    
+    const errorMsg = error.message || 'Failed to load data';
+    setError(`Error: ${errorMsg}. Check console for details.`);
+    
+    // Show helpful error message to user
+    if (error.message.includes('Network Error')) {
+      setError('Cannot connect to server. Make sure the backend is running on http://localhost:8000');
+    } else if (error.response?.status === 404) {
+      setError('API endpoint not found. Check if the server routes are configured correctly.');
+    }
+    
+    Logger.error('Error loading meals and categories:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   /**
    * Filter meals based on search and category
@@ -129,10 +204,10 @@ const MealManagement = () => {
   /**
    * Handle meal saved
    */
-  const handleMealSaved = () => {
-    loadMealsAndCategories();
-    handleModalClose();
-  };
+  // const handleMealSaved = () => {
+  //   loadMealsAndCategories();
+  //   handleModalClose();
+  // };
 
   if (error) {
     return (

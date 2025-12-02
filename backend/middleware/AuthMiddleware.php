@@ -21,7 +21,7 @@ class AuthMiddleware {
         try {
             $headers = getallheaders();
             $authHeader = $headers['Authorization'] ?? '';
-            
+
             $this->logger->debug("AuthMiddleware: Verifying token from header");
 
             if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
@@ -32,7 +32,7 @@ class AuthMiddleware {
 
             $token = $matches[1];
             $payload = AuthController::verifyToken($token);
-            
+
             if (!$payload) {
                 $this->logger->warning("AuthMiddleware: Invalid or expired token");
                 Response::error('Invalid or expired token', [], 401);

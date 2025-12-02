@@ -1,12 +1,10 @@
+// Update your api.js with detailed debugging
 import axios from "axios";
 import { Logger } from "../utils/helpers";
+import { debugService } from "../services/debug";
 
-/**
- * API service configuration and interceptors
- */
 const API_BASE_URL = "http://localhost:8000/api";
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -15,7 +13,7 @@ const api = axios.create({
   withCredentials: false,
 });
 
-// Request interceptor to add auth token
+// Enhanced request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -31,54 +29,93 @@ api.interceptors.request.use(
         }`
       );
     }
+
+    // Log detailed request info in development
+    if (import.meta.env.NODE_ENV === "development") {
+      debugService.logApiRequest(config);
+    }
+
     return config;
   },
   (error) => {
-    Logger.error("API Request Error:", error);
+    console.error("❌ Request Interceptor Error:", error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor to handle PHP warnings and error handling
+// Enhanced response interceptor
 api.interceptors.response.use(
   (response) => {
-    // Handle PHP warnings that corrupt JSON
+    // Log detailed response in development
+    if (import.meta.env.NODE_ENV === "development") {
+      debugService.logApiResponse(response.config.url, response);
+    }
+
+    // Handle PHP warnings/errors in response
     if (typeof response.data === "string") {
+      console.warn("⚠️ Response is string, attempting to parse as JSON...");
+
+      // Check if it's HTML error page
+      if (
+        response.data.includes("<html") ||
+        response.data.includes("<!DOCTYPE")
+      ) {
+        console.error(
+          "❌ Server returned HTML instead of JSON. Likely PHP error:"
+        );
+        console.error(response.data.substring(0, 500));
+
+        throw new Error("Server returned HTML error page. Check PHP logs.");
+      }
+
+      // Try to extract JSON
       try {
-        // Try to extract JSON from the string
         const jsonMatch = response.data.match(/\{.*\}/s);
         if (jsonMatch) {
           response.data = JSON.parse(jsonMatch[0]);
-          Logger.debug("API Response: Extracted JSON from corrupted response");
+          console.log("✅ Successfully extracted JSON from response");
+        } else {
+          console.error("❌ No JSON found in response string");
+          console.log("Response preview:", response.data.substring(0, 500));
         }
-      } catch (error) {
-        Logger.error("API Response: Failed to parse corrupted JSON", error);
+      } catch (parseError) {
+        console.error("❌ Failed to parse response as JSON:", parseError);
+        console.log("Raw response:", response.data);
       }
     }
 
-    Logger.debug(
-      `API Response: ${response.status} ${response.config.url}`,
-      response.data
-    );
+    // Validate response structure
+    if (!response.data) {
+      console.error("❌ Empty response data");
+    } else if (!response.data.success && response.data.success !== false) {
+      console.warn("⚠️ Response missing success property:", response.data);
+    }
+
+    Logger.debug(`API Response: ${response.status} ${response.config.url}`);
     return response;
   },
   (error) => {
     const errorMessage =
       error.response?.data?.message || error.message || "Network error";
 
+    // Log detailed error in development
+    if (import.meta.env.NODE_ENV === "development") {
+      debugService.logApiResponse(error.config?.url, null, error);
+    }
+
     Logger.error("API Response Error:", {
       url: error.config?.url,
       status: error.response?.status,
       message: errorMessage,
+      data: error.response?.data,
     });
 
-    // Auto logout on 401 Unauthorized
+    // Auto logout on 401
     if (error.response?.status === 401) {
       Logger.warn("Authentication failed (401), clearing tokens");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Redirect to login page if we're in a browser environment
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -91,5 +128,8 @@ api.interceptors.response.use(
     });
   }
 );
+
+// Add test method to api object
+api.testConnection = debugService.testConnection;
 
 export default api;
