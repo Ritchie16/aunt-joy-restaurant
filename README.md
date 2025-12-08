@@ -182,28 +182,66 @@ Creating Additional Users
 
     Click "Add User" to create new staff accounts
 
-Email Configuration (Optional)
+### Email Configuration (Optional)
 
-To enable email sending for staff credentials:
+You can send staff credential emails from the backend using any SMTP provider. Below are concise, practical steps for Gmail (recommended for quick setup) and alternatives for production/testing.
 
-    For Gmail:
+For Gmail (App Passwords)
+1. Open https://myaccount.google.com/security
+2. Enable "2-Step Verification" for the Gmail account you will send from.
+3. Under "Signing in to Google" → "App passwords" create a new app password:
+   - Select "Mail" (or choose "Other" and name it e.g. "Aunt Joy Backend").
+   - Generate and copy the 16-character app password.
+4. Put the credentials into backend/.env (do not commit .env):
 
-        Enable 2-Factor Authentication
-
-        Generate an App Password
-
-        Use the app password in SMTP_PASS
-
-    Update .env:
-    env
-```bash
+```env
 SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
+SMTP_PORT=587      # use 465 for SSL
 SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_16_digit_app_password
+SMTP_PASS=your_16_char_app_password
 SMTP_FROM=your_email@gmail.com
-SMTP_FROM_NAME=Aunt Joy Restaurant
+SMTP_FROM_NAME="Aunt Joy Restaurant"
+SMTP_SECURE=tls     # or ssl
 ```
+
+Notes:
+- Gmail will no longer accept "Less secure apps"; app passwords + 2FA is required.
+- Use port 587 + TLS for modern setups; port 465 + SSL is also supported.
+- Keep the SMTP account dedicated for system emails if possible to avoid rate limits or account lockouts.
+
+Testing & Local Development
+- Use a local SMTP sink like MailHog, smtp4dev, or a service like Mailtrap for safe testing without sending real emails.
+- Example Mailtrap .env:
+```env
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your_mailtrap_user
+SMTP_PASS=your_mailtrap_pass
+```
+
+PHPMailer debug
+- To troubleshoot, enable debug in the code where PHPMailer is configured:
+```php
+$mail->SMTPDebug = 2; // set to 0 in production
+$mail->isSMTP();
+```
+
+Production recommendations
+- For higher deliverability and monitoring, use transactional providers (SendGrid, Mailgun, Amazon SES).
+- Configure SPF, DKIM, and DMARC DNS records for your sending domain.
+- Monitor sending limits and bounce reports.
+
+Security
+- Never commit .env files or real credentials to version control.
+- Rotate app passwords / API keys periodically.
+- Use a dedicated service account and restrict access.
+
+Troubleshooting
+- "Authentication failed": confirm SMTP_USER and SMTP_PASS (app password) and that 2FA is enabled.
+- "Connection timed out": confirm SMTP_HOST, port, and that your host allows outbound SMTP.
+- Check backend/logs/app.log and PHPMailer debug output for details.
+
+
 📁 Project Structure
 
 aunt-joy-restaurant/ <br>
