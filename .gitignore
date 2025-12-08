@@ -13,6 +13,7 @@ yarn-error.log*
 # Logs
 logs/
 *.log
+!backend/logs/app.log
 
 # Uploads
 uploads/
