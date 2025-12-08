@@ -242,7 +242,7 @@ Troubleshooting
 - Check backend/logs/app.log and PHPMailer debug output for details.
 
 
-📁 Project Structure
+### 📁 Project Structure
 
 aunt-joy-restaurant/ <br>
 ├── backend/ <br>
@@ -299,7 +299,7 @@ git ls-files | grep .env
 
 # Should only show .env.example files, no .env files
 ``` 
-👥 User Roles
+### 👥 User Roles
 
    Admin: Full system access, user management, reports
 
@@ -309,7 +309,7 @@ git ls-files | grep .env
 
    Customer: Browse meals, place orders, view order history
 
-🐛 Troubleshooting
+### 🐛 Troubleshooting
 Common Issues:
 
  CORS Errors:
@@ -369,7 +369,7 @@ Backend:
 
    Update .env for production values
 
-🤝 Contributing
+### 🤝 Contributing
 
   Fork the repository
 
