@@ -28,19 +28,28 @@ class AuthMiddleware
             // Call the existing verifyToken method
             $payload = $this->verifyToken();
 
-            if ($payload) {
-                return $payload;
+            if (!$payload) {
+                $this->logger->error("AuthMiddleware: Authentication failed - No valid token");
+                return null; // Return null instead of test user
             }
 
-            // For development, return a test user if no token
-            $this->logger->warning("AuthMiddleware: No valid token, using test user for development");
-            return [
-                'id' => 1,
-                'name' => 'System Administrator',
-                'email' => 'admin@auntjoy.com',
-                'role' => 'admin',
-                'is_active' => true
-            ];
+            // Get full user details from database
+            $userModel = new User();
+            $user = $userModel->findById($payload['user_id']);
+
+            if (!$user) {
+                $this->logger->error("AuthMiddleware: User not found in database - ID: {$payload['user_id']}");
+                return null;
+            }
+
+            if (!$user['is_active']) {
+                $this->logger->warning("AuthMiddleware: Inactive user - {$user['email']}");
+                return null;
+            }
+
+            $this->logger->info("AuthMiddleware: User authenticated - {$user['email']} ({$user['role']})");
+            return $user; // Return full user data from database
+
         } catch (Exception $e) {
             $this->logger->error("AuthMiddleware authenticate error: " . $e->getMessage());
             return null;
@@ -60,59 +69,27 @@ class AuthMiddleware
 
             if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
                 $this->logger->warning("AuthMiddleware: No Authorization header found");
-                // Return test user for development
-                return [
-                    'id' => 1,
-                    'name' => 'System Administrator',
-                    'email' => 'admin@auntjoy.com',
-                    'role' => 'admin',
-                    'is_active' => true
-                ];
+                return null; // No token, return null
             }
 
             $token = $matches[1];
 
-            // Check if AuthController exists and has verifyToken method
-            if (class_exists('AuthController') && method_exists('AuthController', 'verifyToken')) {
-                $payload = AuthController::verifyToken($token);
-            } else {
-                // For development, return test user
-                $this->logger->warning("AuthController::verifyToken not available, using test user");
-                $payload = [
-                    'id' => 1,
-                    'name' => 'System Administrator',
-                    'email' => 'admin@auntjoy.com',
-                    'role' => 'admin',
-                    'is_active' => true
-                ];
-            }
+            // Use AuthController to verify token
+            $payload = AuthController::verifyToken($token);
 
             if (!$payload) {
                 $this->logger->warning("AuthMiddleware: Invalid or expired token");
-                // Return test user for development
-                return [
-                    'id' => 1,
-                    'name' => 'System Administrator',
-                    'email' => 'admin@auntjoy.com',
-                    'role' => 'admin',
-                    'is_active' => true
-                ];
+                return null;
             }
 
-            $this->logger->info("AuthMiddleware: User authenticated - {$payload['email']} ({$payload['role']})");
-            return $payload;
+            return $payload; // Return token payload
+
         } catch (Exception $e) {
             $this->logger->error("AuthMiddleware error: " . $e->getMessage());
-            // Return test user for development instead of failing
-            return [
-                'id' => 1,
-                'name' => 'System Administrator',
-                'email' => 'admin@auntjoy.com',
-                'role' => 'admin',
-                'is_active' => true
-            ];
+            return null;
         }
     }
+
 
     /**
      * Middleware to require authentication

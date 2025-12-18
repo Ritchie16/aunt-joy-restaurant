@@ -134,13 +134,13 @@ class AuthController
      */
     private function generateJWT($user)
     {
-
         $jwtSecret = getenv('JWT_SECRET') ?: "aunt_joy_restaurant_secret_key_2025";
 
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload = json_encode([
-            'user_id' => $user['id'],
+            'user_id' => $user['id'], // Make sure this is included
             'email' => $user['email'],
+            'name' => $user['name'], // Include name for better debugging
             'role' => $user['role'],
             'exp' => time() + (24 * 60 * 60) // 24 hours
         ]);
@@ -153,7 +153,6 @@ class AuthController
 
         return "$base64Header.$base64Payload.$base64Signature";
     }
-
     /**
      * Verify JWT token
      */

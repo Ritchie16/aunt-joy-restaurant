@@ -83,59 +83,64 @@ const MealForm = ({ meal, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
-  
   if (!validateForm()) return;
-  
   setIsLoading(true);
-  
+
   try {
-    // Get token from localStorage
-    const token = localStorage.getItem('token');
-    
-    // Create FormData for file upload
+    // 1. Create FormData
     const submitData = new FormData();
+    
+    // 2. Append all fields - Use the exact field names your backend expects
     submitData.append('name', formData.name);
-    submitData.append('description', formData.description);
-    submitData.append('price', formData.price);
-    submitData.append('category_id', formData.category_id);
-    submitData.append('is_available', formData.is_available);
+    submitData.append('description', formData.description || '');
+    submitData.append('price', parseFloat(formData.price).toString());
+    submitData.append('category_id', formData.category_id.toString());
+    submitData.append('is_available', formData.is_available.toString());
     
-    if (imageFile) {
+    // 3. Append image only if it's a new file
+    if (imageFile && imageFile instanceof File) {
       submitData.append('image', imageFile);
+    } else if (meal?.image_path) {
+      // If editing and no new image, send existing path
+      submitData.append('image_path', meal.image_path);
     }
-    
-    const headers = {
-      'Content-Type': 'multipart/form-data'
-    };
-    
-    // Add Authorization header if token exists
+
+    console.log('FormData entries:'); // Debug line
+    for (let pair of submitData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+
+    // 4. Get token and send request
+    const token = localStorage.getItem('token');
+    const headers = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+    // Note: DON'T set Content-Type header - browser will set it with boundary for FormData
+
     let response;
     if (meal) {
-      // Update existing meal
+      // UPDATE
       response = await api.put(`/meals/${meal.id}`, submitData, { headers });
       Logger.info(`Meal updated: ${formData.name}`);
     } else {
-      // Create new meal
+      // CREATE
       response = await api.post('/meals', submitData, { headers });
       Logger.info(`Meal created: ${formData.name}`);
     }
-    
+
     if (response.data.success) {
       onSuccess();
       onClose();
     }
   } catch (error) {
     Logger.error('Error saving meal:', error);
-    alert(error.message || 'Failed to save meal');
+    console.error('Full error details:', error.response?.data || error.message);
+    alert(error.response?.data?.message || 'Failed to save meal');
   } finally {
     setIsLoading(false);
   }
- };
-
+};
 
   return (
     <div className="max-w-2xl mx-auto p-6">

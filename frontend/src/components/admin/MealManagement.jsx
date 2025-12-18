@@ -288,10 +288,15 @@ const loadMealsAndCategories = async () => {
                         <div className="h-10 w-10 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
                           {meal.image_path ? (
                             <img
-                              src={meal.image_path}
-                              alt={meal.name}
-                              className="h-10 w-10 object-cover"
-                            />
+  src={meal.image_path ? `http://localhost:8000${meal.image_path}` : ''}
+  alt={meal.name}
+  className="h-10 w-10 object-cover"
+  onError={(e) => {
+    // Fallback if image fails to load
+    e.target.style.display = 'none';
+    e.target.parentElement.innerHTML = '<div class="h-10 w-10 flex items-center justify-center bg-gray-100"><Utensils className="h-5 w-5 text-gray-400" /></div>';
+  }}
+/>
                           ) : (
                             <div className="h-10 w-10 flex items-center justify-center bg-gray-100">
                               <Utensils className="h-5 w-5 text-gray-400" />
