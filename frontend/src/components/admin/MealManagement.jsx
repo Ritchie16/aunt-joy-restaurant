@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Utensils } from 'lucide-react';
-import  api  from '../../services/api';
+import { Plus, Search, Filter, Edit, Trash2, Utensils, User, UserCheck } from 'lucide-react';
+import api from '../../services/api';
 import { Logger } from '../../utils/helpers';
 import Modal from '../common/Modal';
 import LoadingSpinner from '../common/LoadingSpinner';
+import MealForm from './MealForm';
+
 
 /**
  * Meal Management Component for Admin
@@ -224,7 +226,7 @@ const loadMealsAndCategories = async () => {
     );
   }
 
-  return (
+   return (
     <div>
       {/* Header and Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -242,43 +244,7 @@ const loadMealsAndCategories = async () => {
         </button>
       </div>
 
-      {/* Search and Filter */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search meals by name or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-              />
-            </div>
-          </div>
-
-          {/* Category Filter */}
-          <div className="md:w-48">
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Search and Filter - existing code ... */}
 
       {/* Meals Table */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -302,6 +268,12 @@ const loadMealsAndCategories = async () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created By
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Updated By
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -347,6 +319,28 @@ const loadMealsAndCategories = async () => {
                         {meal.is_available ? 'Available' : 'Out of Stock'}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900">
+                        <User className="h-4 w-4 mr-1 text-gray-400" />
+                        <div>
+                          <div className="font-medium">{meal.creator_name || 'Unknown'}</div>
+                          {meal.creator_email && (
+                            <div className="text-xs text-gray-500">{meal.creator_email}</div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900">
+                        <UserCheck className="h-4 w-4 mr-1 text-blue-400" />
+                        <div>
+                          <div className="font-medium">{meal.updater_name || meal.creator_name || 'Unknown'}</div>
+                          {meal.updater_email && (
+                            <div className="text-xs text-gray-500">{meal.updater_email}</div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         <button
@@ -388,23 +382,21 @@ const loadMealsAndCategories = async () => {
         )}
       </div>
 
-      {/* Meal Modal would go here */}
-      {/* For now, we'll just show a basic modal structure */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        title={selectedMeal ? 'Edit Meal' : 'Add New Meal'}
-        size="lg"
-      >
-        <div className="text-center py-8">
-          <p className="text-gray-600">
-            Meal form would be implemented here
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            This would include fields for name, description, price, category, and image upload.
-          </p>
-        </div>
-      </Modal>
+      
+{isModalOpen && (
+  <Modal
+    isOpen={isModalOpen}
+    onClose={handleModalClose}
+    title={selectedMeal ? 'Edit Meal' : 'Add New Meal'}
+    size="lg"
+  >
+    <MealForm
+      meal={selectedMeal}
+      onClose={handleModalClose}
+      onSuccess={loadMealsAndCategories}
+    />
+  </Modal>
+)}
     </div>
   );
 };

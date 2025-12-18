@@ -1,4 +1,5 @@
 -- Create database if it doesn't exist
+--This is database.sql file at root dir in backend
 CREATE DATABASE IF NOT EXISTS aunt_joy_restaurant;
 USE aunt_joy_restaurant;
 
@@ -27,6 +28,7 @@ CREATE TABLE categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
 CREATE TABLE meals (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -35,9 +37,13 @@ CREATE TABLE meals (
     image_path VARCHAR(255),
     category_id INT,
     is_available BOOLEAN DEFAULT TRUE,
+    created_by INT,  -- NEW: who created the meal
+    updated_by INT,  -- NEW: who last updated the meal
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,  -- NEW
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL   -- NEW
 );
 
 CREATE TABLE orders (
