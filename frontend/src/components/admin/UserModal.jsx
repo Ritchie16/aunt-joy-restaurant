@@ -235,7 +235,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
           </div>
 
           {/* Email Field */}
-          <div>
+          {/* <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               <Mail className="h-4 w-4 inline mr-1" />
               Email Address *
@@ -255,7 +255,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Role Field */}
           <div>
@@ -357,14 +357,14 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
           )}
 
           {/* Staff Role Notice */}
-          {formData.role !== 'customer' && (
+          {/* {formData.role !== 'customer' && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <p className="text-sm text-yellow-800">
                 <strong>Note:</strong> For {formData.role} roles, login credentials will be 
                 automatically sent to the provided email address.
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Submit Error */}
           {errors.submit && (
