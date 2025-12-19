@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/useAuth';
 import { CartProvider } from './contexts/CartContext';
 import Layout from './components/layouts/Layout';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerDashboard from './pages/CustomerDashboard';
@@ -36,10 +37,11 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 /**
  * Public Route Component - redirects authenticated users
  */
-const PublicRoute = ({ children }) => {
+const PublicRoute = ({ children, allowAuthenticated = false }) => {
   const { isAuthenticated } = useAuth();
   
-  if (isAuthenticated) {
+  // For landing page and similar public pages, allow authenticated users too
+  if (!allowAuthenticated && isAuthenticated) {
     Logger.debug('User already authenticated, redirecting to dashboard');
     return <Navigate to="/dashboard" replace />;
   }
@@ -81,7 +83,13 @@ function App() {
         <CartProvider>
           <div className="App">
             <Routes>
-              {/* Public Routes */}
+              {/* Public Routes - Landing Page accessible to all */}
+              <Route path="/" element={
+                <PublicRoute allowAuthenticated={true}>
+                  <LandingPage />
+                </PublicRoute>
+              } />
+              
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
@@ -94,15 +102,7 @@ function App() {
                 </PublicRoute>
               } />
 
-              {/* Protected Routes with Layout */}
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <DashboardRedirect />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-
+              {/* Dashboard Redirect Route */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Layout>
@@ -112,37 +112,56 @@ function App() {
               } />
 
               {/* Customer Routes */}
-              <Route path="/customer" element={
+              <Route path="/customer/*" element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <Layout>
-                    <CustomerDashboard />
+                    <Routes>
+                      <Route index element={<CustomerDashboard />} />
+                      <Route path="menu" element={<CustomerDashboard />} />
+                      <Route path="cart" element={<CustomerDashboard />} />
+                      <Route path="orders" element={<CustomerDashboard />} />
+                    </Routes>
                   </Layout>
                 </ProtectedRoute>
               } />
 
               {/* Admin Routes */}
-              <Route path="/admin" element={
+              <Route path="/admin/*" element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <Layout>
-                    <AdminDashboard />
+                    <Routes>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="users" element={<AdminDashboard />} />
+                      <Route path="meals" element={<AdminDashboard />} />
+                      <Route path="reports" element={<AdminDashboard />} />
+                    </Routes>
                   </Layout>
                 </ProtectedRoute>
               } />
 
               {/* Sales Personnel Routes */}
-              <Route path="/sales" element={
+              <Route path="/sales/*" element={
                 <ProtectedRoute allowedRoles={['sales']}>
                   <Layout>
-                    <SalesDashboard />
+                    <Routes>
+                      <Route index element={<SalesDashboard />} />
+                      <Route path="orders" element={<SalesDashboard />} />
+                      <Route path="customers" element={<SalesDashboard />} />
+                    </Routes>
                   </Layout>
                 </ProtectedRoute>
               } />
 
               {/* Manager Routes */}
-              <Route path="/manager" element={
+              <Route path="/manager/*" element={
                 <ProtectedRoute allowedRoles={['manager']}>
                   <Layout>
-                    <ManagerDashboard />
+                    <Routes>
+                      <Route index element={<ManagerDashboard />} />
+                      <Route path="reports" element={<ManagerDashboard />} />
+                      <Route path="analytics" element={<ManagerDashboard />} />
+                      <Route path="staff" element={<ManagerDashboard />} />
+                    </Routes>
                   </Layout>
                 </ProtectedRoute>
               } />
@@ -153,6 +172,12 @@ function App() {
                   <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Unauthorized Access</h1>
                     <p className="text-gray-600">You don't have permission to access this page.</p>
+                    <button 
+                      onClick={() => window.location.href = '/'}
+                      className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                    >
+                      Return to Home
+                    </button>
                   </div>
                 </div>
               } />
@@ -162,6 +187,12 @@ function App() {
                   <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Page Not Found</h1>
                     <p className="text-gray-600">The page you're looking for doesn't exist.</p>
+                    <button 
+                      onClick={() => window.location.href = '/'}
+                      className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                    >
+                      Go to Homepage
+                    </button>
                   </div>
                 </div>
               } />

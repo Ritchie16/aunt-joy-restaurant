@@ -1,0 +1,26 @@
+/* src/components/common/Button.css */
+.btn {
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 6px rgba(2, 132, 199, 0.3);
+}

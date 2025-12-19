@@ -1,0 +1,124 @@
+/* src/components/landing/Testimonials.css */
+.testimonials-section {
+  padding: 6rem 1.5rem;
+  background: var(--gray-50);
+  position: relative;
+}
+
+.testimonials-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-300), transparent);
+}
+
+.testimonial-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-300);
+}
+
+.testimonial-content {
+  flex: 1;
+  position: relative;
+}
+
+.quote-icon {
+  font-size: 3rem;
+  color: var(--primary-100);
+  line-height: 1;
+  margin-bottom: 1rem;
+  font-family: Georgia, serif;
+}
+
+.testimonial-text {
+  font-style: italic;
+  color: var(--gray-700);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.testimonial-text::before {
+  content: '"';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 2rem;
+  color: var(--primary-300);
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-200);
+  margin-top: auto;
+}
+
+.author-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-200);
+  background: var(--gray-100);
+}
+
+.author-info h4 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: 1rem;
+}
+
+.author-info p {
+  margin: 0;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+}
+
+/* Rating Stars */
+.star-rating {
+  display: flex;
+  gap: 0.125rem;
+  margin-bottom: 1rem;
+}
+
+.star-rating .star {
+  color: var(--gray-300);
+}
+
+.star-rating .star.filled {
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .testimonials-section {
+    padding: 4rem 1rem;
+  }
+  
+  .testimonial-card {
+    padding: 1.5rem;
+  }
+}

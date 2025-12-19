@@ -1,0 +1,11 @@
+/* src/components/landing/LandingLayout.css */
+.landing-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.landing-main {
+  flex: 1;
+}
