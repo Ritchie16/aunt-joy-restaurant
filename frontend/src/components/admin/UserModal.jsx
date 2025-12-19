@@ -235,7 +235,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
           </div>
 
           {/* Email Field */}
-          {/* <div>
+          {!user && 
+            (<div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               <Mail className="h-4 w-4 inline mr-1" />
               Email Address *
@@ -250,12 +251,13 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 errors.email ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter email address"
-              disabled={isSubmitting || user} // Can't change email when editing
+              disabled={isSubmitting} // Can't change email when editing
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email}</p>
             )}
-          </div> */}
+          </div>
+          )}
 
           {/* Role Field */}
           <div>
@@ -329,7 +331,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
           </div>
 
           {/* Password Information for New Users */}
-          {!user && (
+          {/* {!user && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-blue-800 flex items-center">
@@ -354,7 +356,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 )}
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Staff Role Notice */}
           {/* {formData.role !== 'customer' && (
