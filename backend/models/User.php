@@ -142,7 +142,7 @@ class User
     public function update($id, $data)
     {
         try {
-            $allowedFields = ['name', 'email', 'phone', 'address', 'is_active'];
+            $allowedFields = ['name', 'email', 'role', 'phone', 'address', 'is_active'];
             $updates = [];
             $params = ['id' => $id];
 
@@ -192,7 +192,8 @@ class User
     /**
      * activate user
      */
-    public function activate($id){
+    public function activate($id)
+    {
         try {
             $query = "UPDATE {$this->table} SET is_active = TRUE WHERE id = :id";
             $stmt = $this->conn->prepare($query);

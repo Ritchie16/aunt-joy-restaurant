@@ -1,223 +1,372 @@
 <?php
 /**
- * Order Model - Handles order database operations
+ * Meal Model - Handles meal database operations
  */
-require_once '../config/Database.php';
-require_once '../utils/Logger.php';
 
-class Order {
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../utils/Logger.php';
+
+class Meal
+{
     private $conn;
-    private $table = 'orders';
-    private $itemsTable = 'order_items';
+    private $table = 'meals';
     private $logger;
 
-    public function __construct() {
-        $database = new Database();
-        $this->conn = $database->getConnection();
-        $this->logger = new Logger();
-    }
-
-    /**
-     * Create new order with items
-     */
-    public function create($orderData, $items) {
-        $this->conn->beginTransaction();
-
+    public function __construct()
+    {
         try {
-            // Insert order
-            $query = "
-                INSERT INTO {$this->table}
-                (customer_id, order_number, total_amount, delivery_address, customer_phone, special_instructions)
-                VALUES (:customer_id, :order_number, :total_amount, :delivery_address, :customer_phone, :special_instructions)
-            ";
-
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute($orderData);
-            $orderId = $this->conn->lastInsertId();
-
-            // Insert order items
-            foreach ($items as $item) {
-                $itemQuery = "
-                    INSERT INTO {$this->itemsTable}
-                    (order_id, meal_id, quantity, unit_price, total_price)
-                    VALUES (:order_id, :meal_id, :quantity, :unit_price, :total_price)
-                ";
-
-                $itemStmt = $this->conn->prepare($itemQuery);
-                $itemStmt->execute([
-                    'order_id' => $orderId,
-                    'meal_id' => $item['meal_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total_price' => $item['total_price']
-                ]);
-            }
-
-            $this->conn->commit();
-            $this->logger->info("Order created successfully: {$orderData['order_number']}");
-            return $orderId;
-
+            $database = new Database();
+            $this->conn = $database->getConnection();
+            $this->logger = new Logger();
+            $this->logger->debug("Meal model initialized");
         } catch (Exception $e) {
-            $this->conn->rollBack();
-            $this->logger->error("Error creating order: " . $e->getMessage());
-            return false;
+            $this->logger = new Logger();
+            $this->logger->error("Failed to initialize Meal model: " . $e->getMessage());
+            throw $e;
         }
     }
 
     /**
-     * Get orders by customer ID
+     * Get all meals with categories (for backward compatibility)
      */
-    public function getByCustomerId($customerId) {
+    public function getAllWithCategories()
+    {
         try {
+            $this->logger->info("Getting all meals with categories");
+
             $query = "
-                SELECT o.*,
-                       COUNT(oi.id) as item_count,
-                       SUM(oi.quantity) as total_quantity
-                FROM {$this->table} o
-                LEFT JOIN {$this->itemsTable} oi ON o.id = oi.order_id
-                WHERE o.customer_id = :customer_id
-                GROUP BY o.id
-                ORDER BY o.created_at DESC
-            ";
-
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':customer_id', $customerId);
-            $stmt->execute();
-
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $this->logger->debug("Retrieved " . count($orders) . " orders for customer ID: {$customerId}");
-
-            return $orders;
-
-        } catch (PDOException $e) {
-            $this->logger->error("Error retrieving orders for customer {$customerId}: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Get all orders with customer details
-     */
-    public function getAllWithDetails() {
-        try {
-            $query = "
-                SELECT o.*,
-                       u.name as customer_name,
-                       u.email as customer_email,
-                       u.phone as customer_phone,
-                       COUNT(oi.id) as item_count,
-                       SUM(oi.quantity) as total_quantity
-                FROM {$this->table} o
-                LEFT JOIN users u ON o.customer_id = u.id
-                LEFT JOIN {$this->itemsTable} oi ON o.id = oi.order_id
-                GROUP BY o.id
-                ORDER BY o.created_at DESC
+                SELECT m.*, c.name as category_name 
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                ORDER BY m.created_at DESC
             ";
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
 
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $this->logger->debug("Retrieved " . count($orders) . " orders with details");
+            $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            return $orders;
+            $this->logger->info("Retrieved " . count($meals) . " meals");
 
+            return $meals;
         } catch (PDOException $e) {
-            $this->logger->error("Error retrieving all orders: " . $e->getMessage());
+            $this->logger->error("Error in getAllWithCategories: " . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Get order by ID with full details
+     * Get available meals for customers
      */
-    public function getByIdWithDetails($orderId) {
+    public function getAvailable()
+    {
         try {
-            // Get order basic info
-            $orderQuery = "
-                SELECT o.*, u.name as customer_name, u.email as customer_email
-                FROM {$this->table} o
-                LEFT JOIN users u ON o.customer_id = u.id
-                WHERE o.id = :order_id
+            $this->logger->info("Getting available meals");
+
+            $query = "
+                SELECT m.*, c.name as category_name 
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                WHERE m.is_available = 1 
+                ORDER BY m.name
             ";
 
-            $orderStmt = $this->conn->prepare($orderQuery);
-            $orderStmt->bindParam(':order_id', $orderId);
-            $orderStmt->execute();
-            $order = $orderStmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
 
-            if (!$order) {
-                return null;
+            $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->logger->info("Retrieved " . count($meals) . " available meals");
+
+            return $meals;
+        } catch (PDOException $e) {
+            $this->logger->error("Error in getAvailable: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get meal by ID (for backward compatibility)
+     */
+    public function findById($id)
+    {
+        try {
+            $this->logger->info("Finding meal by ID: {$id}");
+
+            $query = "
+                SELECT m.*, c.name as category_name 
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                WHERE m.id = :id
+            ";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $meal = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($meal) {
+                $this->logger->info("Meal found: {$meal['name']}");
+            } else {
+                $this->logger->info("Meal not found with ID: {$id}");
             }
 
-            // Get order items
-            $itemsQuery = "
-                SELECT oi.*, m.name as meal_name, m.image_path
-                FROM {$this->itemsTable} oi
-                LEFT JOIN meals m ON oi.meal_id = m.id
-                WHERE oi.order_id = :order_id
-            ";
-
-            $itemsStmt = $this->conn->prepare($itemsQuery);
-            $itemsStmt->bindParam(':order_id', $orderId);
-            $itemsStmt->execute();
-            $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $order['items'] = $items;
-            $this->logger->debug("Retrieved full details for order ID: {$orderId}");
-
-            return $order;
-
+            return $meal;
         } catch (PDOException $e) {
-            $this->logger->error("Error retrieving order details for ID {$orderId}: " . $e->getMessage());
+            $this->logger->error("Error in findById: " . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Update order status
+     * Get all meals with categories and creator/updater info
      */
-    public function updateStatus($orderId, $status) {
+    public function getAllWithDetails()
+    {
         try {
-            $query = "UPDATE {$this->table} SET status = :status WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':status', $status);
-            $stmt->bindParam(':id', $orderId);
-            $stmt->execute();
+            $this->logger->info("Getting all meals with details");
 
-            $this->logger->info("Order status updated: ID {$orderId} -> {$status}");
-            return true;
-
-        } catch (PDOException $e) {
-            $this->logger->error("Error updating order status for ID {$orderId}: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Get orders by status
-     */
-    public function getByStatus($status) {
-        try {
             $query = "
-                SELECT o.*, u.name as customer_name, u.phone as customer_phone
-                FROM {$this->table} o
-                LEFT JOIN users u ON o.customer_id = u.id
-                WHERE o.status = :status
-                ORDER BY o.created_at ASC
+                SELECT 
+                    m.*, 
+                    c.name as category_name,
+                    creator.name as creator_name,
+                    creator.email as creator_email,
+                    updater.name as updater_name,
+                    updater.email as updater_email
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                LEFT JOIN users creator ON m.created_by = creator.id
+                LEFT JOIN users updater ON m.updated_by = updater.id
+                ORDER BY m.created_at DESC
             ";
 
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':status', $status);
             $stmt->execute();
 
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $this->logger->debug("Retrieved " . count($orders) . " orders with status: {$status}");
+            $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            return $orders;
+            $this->logger->info("Retrieved " . count($meals) . " meals with details");
 
+            return $meals;
         } catch (PDOException $e) {
-            $this->logger->error("Error retrieving orders by status {$status}: " . $e->getMessage());
+            $this->logger->error("Error in getAllWithDetails: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get available meals with creator info
+     */
+    public function getAvailableWithDetails()
+    {
+        try {
+            $this->logger->info("Getting available meals with details");
+
+            $query = "
+                SELECT 
+                    m.*, 
+                    c.name as category_name,
+                    creator.name as creator_name
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                LEFT JOIN users creator ON m.created_by = creator.id
+                WHERE m.is_available = 1 
+                ORDER BY m.name
+            ";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->logger->info("Retrieved " . count($meals) . " available meals");
+
+            return $meals;
+        } catch (PDOException $e) {
+            $this->logger->error("Error in getAvailableWithDetails: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get meal by ID with creator/updater details
+     */
+    public function findByIdWithDetails($id)
+    {
+        try {
+            $this->logger->info("Finding meal by ID with details: {$id}");
+
+            $query = "
+                SELECT 
+                    m.*, 
+                    c.name as category_name,
+                    creator.name as creator_name,
+                    creator.email as creator_email,
+                    updater.name as updater_name,
+                    updater.email as updater_email
+                FROM {$this->table} m 
+                LEFT JOIN categories c ON m.category_id = c.id 
+                LEFT JOIN users creator ON m.created_by = creator.id
+                LEFT JOIN users updater ON m.updated_by = updater.id
+                WHERE m.id = :id
+            ";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $meal = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($meal) {
+                $this->logger->info("Meal found with details: {$meal['name']}");
+            } else {
+                $this->logger->info("Meal not found with ID: {$id}");
+            }
+
+            return $meal;
+        } catch (PDOException $e) {
+            $this->logger->error("Error in findByIdWithDetails: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Create new meal with creator info
+     */
+    public function create($data, $userId = null)
+    {
+        try {
+            $this->logger->info("Creating new meal: " . ($data['name'] ?? 'Unknown'));
+
+            $query = "
+                INSERT INTO {$this->table} 
+                (name, description, price, image_path, category_id, is_available, created_by, updated_by) 
+                VALUES (:name, :description, :price, :image_path, :category_id, :is_available, :created_by, :updated_by)
+            ";
+
+            $stmt = $this->conn->prepare($query);
+
+            // Bind parameters
+            $stmt->bindParam(':name', $data['name']);
+            $stmt->bindParam(':description', $data['description'] ?? '');
+            $stmt->bindParam(':price', $data['price']);
+            $stmt->bindParam(':image_path', $data['image_path'] ?? '');
+            $stmt->bindParam(':category_id', $data['category_id']);
+            $stmt->bindParam(':is_available', $data['is_available'] ?? 1, PDO::PARAM_INT);
+            
+            // Use userId if provided, otherwise use default admin (for backward compatibility)
+            $creatorId = $userId ?? 1;
+            $stmt->bindParam(':created_by', $creatorId, PDO::PARAM_INT);
+            $stmt->bindParam(':updated_by', $creatorId, PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            $mealId = $this->conn->lastInsertId();
+
+            $this->logger->info("Meal created successfully with ID: {$mealId} by user: {$creatorId}");
+
+            return $mealId;
+        } catch (PDOException $e) {
+            $this->logger->error("Error creating meal: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update meal with updater info
+     */
+    public function update($id, $data, $userId = null)
+    {
+        try {
+            $this->logger->info("Updating meal ID: {$id} by user: {$userId}");
+
+            // Build dynamic update query
+            $fields = ["updated_by = :updated_by"]; // Always update the updated_by field
+            $params = [
+                ':id' => $id,
+                ':updated_by' => $userId ?? 1 // Use userId if provided, otherwise use default admin
+            ];
+
+            if (isset($data['name'])) {
+                $fields[] = "name = :name";
+                $params[':name'] = $data['name'];
+            }
+            if (isset($data['description'])) {
+                $fields[] = "description = :description";
+                $params[':description'] = $data['description'];
+            }
+            if (isset($data['price'])) {
+                $fields[] = "price = :price";
+                $params[':price'] = $data['price'];
+            }
+            if (isset($data['image_path'])) {
+                $fields[] = "image_path = :image_path";
+                $params[':image_path'] = $data['image_path'];
+            }
+            if (isset($data['category_id'])) {
+                $fields[] = "category_id = :category_id";
+                $params[':category_id'] = $data['category_id'];
+            }
+            if (isset($data['is_available'])) {
+                $fields[] = "is_available = :is_available";
+                $params[':is_available'] = $data['is_available'];
+            }
+
+            if (count($fields) <= 1) { // Only updated_by field
+                $this->logger->warning("No fields to update for meal ID: {$id}");
+                return false;
+            }
+
+            $query = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+
+            // Bind all parameters
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+
+            $success = $stmt->execute();
+
+            if ($success && $stmt->rowCount() > 0) {
+                $this->logger->info("Meal updated successfully: ID {$id} by user {$params[':updated_by']}");
+                return true;
+            } else {
+                $this->logger->warning("No rows affected when updating meal ID: {$id}");
+                return false;
+            }
+        } catch (PDOException $e) {
+            $this->logger->error("Error updating meal: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete meal
+     */
+    public function delete($id)
+    {
+        try {
+            $this->logger->info("Deleting meal ID: {$id}");
+
+            $query = "DELETE FROM {$this->table} WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+
+            $success = $stmt->execute();
+
+            if ($success && $stmt->rowCount() > 0) {
+                $this->logger->info("Meal deleted successfully: ID {$id}");
+                return true;
+            } else {
+                $this->logger->warning("No meal found to delete with ID: {$id}");
+                return false;
+            }
+        } catch (PDOException $e) {
+            $this->logger->error("Error deleting meal: " . $e->getMessage());
             return false;
         }
     }
