@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/useAuth';
 import  api  from '../../services/api';
 import { Logger } from '../../utils/helpers';
 import { CreditCard, MapPin, Phone, MessageSquare } from 'lucide-react';
+import { resolveMediaUrl } from '../../utils/media';
 
 /**
  * Checkout Component for Customer Orders
@@ -195,7 +196,7 @@ const Checkout = () => {
                       <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                         {item.image_path ? (
                           <img
-                            src={item.image_path}
+                            src={resolveMediaUrl(item.image_path)}
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />

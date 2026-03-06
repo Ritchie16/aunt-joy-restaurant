@@ -24,6 +24,7 @@ import { useCart } from '../contexts/CartContext';
 import Menu from '../components/customer/Menu';
 import Checkout from '../components/customer/Checkout';
 import { Logger } from '../utils/helpers';
+import { resolveMediaUrl } from '../utils/media';
 
 const STATUS_META = {
   pending: { label: 'Pending', className: 'bg-amber-100 text-amber-800', icon: Clock3 },
@@ -210,7 +211,7 @@ const CustomerDashboard = () => {
               <article key={meal.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <div className="h-36 w-full bg-gray-100">
                   {meal.image_path ? (
-                    <img src={meal.image_path} alt={meal.name} className="h-full w-full object-cover" />
+                    <img src={resolveMediaUrl(meal.image_path)} alt={meal.name} className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-gray-400">
                       <ShoppingBag className="h-8 w-8" />
@@ -299,7 +300,7 @@ const CustomerDashboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="h-16 w-16 overflow-hidden rounded-lg bg-gray-100">
                     {item.image_path ? (
-                      <img src={item.image_path} alt={item.name} className="h-full w-full object-cover" />
+                      <img src={resolveMediaUrl(item.image_path)} alt={item.name} className="h-full w-full object-cover" />
                     ) : null}
                   </div>
 

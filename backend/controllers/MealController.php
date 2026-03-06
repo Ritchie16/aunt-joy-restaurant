@@ -379,7 +379,9 @@ class MealController
 
             // Validate file
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            $fileType = $_FILES['image']['type'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $fileType = finfo_file($finfo, $_FILES['image']['tmp_name']);
+            finfo_close($finfo);
             $fileSize = $_FILES['image']['size'];
 
             if (!in_array($fileType, $allowedTypes)) {
@@ -393,14 +395,10 @@ class MealController
                 return null;
             }
 
-            // IMPORTANT: Check your actual folder structure
-            // This assumes: project/public/uploads/
-            $projectRoot = realpath(__DIR__ . '/../../');
-            $publicDir = $projectRoot . '/public/';
-            $uploadDir = $publicDir . 'uploads/';
+            // Store uploads in backend/uploads so API can serve them directly
+            $backendRoot = realpath(__DIR__ . '/..');
+            $uploadDir = $backendRoot . '/uploads/';
 
-            $this->logger->debug("Project root: {$projectRoot}");
-            $this->logger->debug("Public directory: {$publicDir}");
             $this->logger->debug("Upload directory: {$uploadDir}");
 
             if (!is_dir($uploadDir)) {
@@ -415,7 +413,16 @@ class MealController
             }
 
             // Generate unique filename
-            $fileExtension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $fileExtension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            if (!in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $fileExtension = match ($fileType) {
+                    'image/jpeg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                    default => 'jpg'
+                };
+            }
             $fileName = uniqid('meal_') . '_' . time() . '.' . $fileExtension;
             $filePath = $uploadDir . $fileName;
 

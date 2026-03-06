@@ -18,6 +18,9 @@ logs/
 # Uploads
 uploads/
 storage/
+!backend/uploads/
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # IDE
 .vscode/

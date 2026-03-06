@@ -8,6 +8,21 @@
 $request_uri = $_SERVER['REQUEST_URI'];
 $path = parse_url($request_uri, PHP_URL_PATH);
 
+// Serve uploaded files directly
+if (strpos($path, '/uploads/') === 0) {
+    $filePath = __DIR__ . $path;
+    if (is_file($filePath)) {
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit();
+    }
+    http_response_code(404);
+    echo 'File not found';
+    exit();
+}
+
 // Set CORS headers for all responses
 header('Access-Control-Allow-Origin: http://localhost:5173');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -64,6 +79,10 @@ if (strpos($path, '/api/') === 0) {
             break;
 
         case preg_match('#^/meals/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'PUT':
+            require __DIR__ . '/api/meals.php';
+            break;
+
+        case preg_match('#^/meals/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'POST':
             require __DIR__ . '/api/meals.php';
             break;
 

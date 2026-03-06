@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Minus, Utensils, Star } from 'lucide-react';
+import { Plus, Minus, Utensils } from 'lucide-react';
 import { Logger } from '../../utils/helpers';
+import { resolveMediaUrl } from '../../utils/media';
 
 /**
  * Meal Card Component for displaying individual meals
@@ -46,7 +47,7 @@ const MealCard = ({ meal, onAddToCart }) => {
       <div className="relative h-48 bg-gray-200">
         {meal.image_path ? (
           <img
-            src={meal.image_path}
+            src={resolveMediaUrl(meal.image_path)}
             alt={meal.name}
             className="w-full h-full object-cover"
           />

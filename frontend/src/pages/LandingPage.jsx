@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Clock3, MapPin, Phone } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/useAuth';
+import { resolveMediaUrl } from '../utils/media';
 
 const LandingPage = () => {
   const { isAuthenticated, user } = useAuth();
@@ -110,7 +111,7 @@ const LandingPage = () => {
                 <article key={meal.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="h-40 bg-slate-100">
                     {meal.image_path ? (
-                      <img src={meal.image_path} alt={meal.name} className="h-full w-full object-cover" />
+                      <img src={resolveMediaUrl(meal.image_path)} alt={meal.name} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-slate-400">No image</div>
                     )}

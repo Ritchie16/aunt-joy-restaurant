@@ -4,7 +4,7 @@ import axios from "axios";
 import { Logger } from "../utils/helpers";
 import { debugService } from "../services/debug";
 
-const API_BASE_URL = "http://localhost:8000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,6 +17,15 @@ const api = axios.create({
 // Enhanced request interceptor
 api.interceptors.request.use(
   (config) => {
+    // Let browser set proper multipart boundaries for file uploads.
+    if (config.data instanceof FormData) {
+      if (config.headers?.set) {
+        config.headers.set("Content-Type", undefined);
+      } else if (config.headers) {
+        delete config.headers["Content-Type"];
+      }
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

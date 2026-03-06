@@ -66,6 +66,9 @@ try {
         case 'POST':
             if ($endpoint === 'meals') {
                 $mealController->createMeal();
+            } elseif (preg_match('/^meals\/(\d+)$/', $endpoint, $matches)) {
+                // Support multipart/form-data updates via POST for file uploads.
+                $mealController->updateMeal($matches[1]);
             } elseif ($endpoint === 'categories') {
                 $categoryController->createCategory();
             } else {

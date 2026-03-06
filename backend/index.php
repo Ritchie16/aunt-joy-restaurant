@@ -37,6 +37,22 @@ try {
 
     $logger->debug("Path after parse_url: {$path}");
 
+    // Serve uploaded files directly
+    if (strpos($path, '/uploads/') === 0) {
+        $filePath = __DIR__ . $path;
+        if (is_file($filePath)) {
+            $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+            header('Content-Type: ' . $mimeType);
+            header('Content-Length: ' . filesize($filePath));
+            readfile($filePath);
+            exit();
+        }
+
+        http_response_code(404);
+        echo 'File not found';
+        exit();
+    }
+
     // Simple routing
     if (strpos($path, '/api/auth/') === 0) {
         $logger->debug("Routing to auth.php");

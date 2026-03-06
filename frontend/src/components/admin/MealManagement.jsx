@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Utensils, User, UserCheck } from 'lucide-react';
 import api from '../../services/api';
 import { Logger } from '../../utils/helpers';
+import { resolveMediaUrl } from '../../utils/media';
 import Modal from '../common/Modal';
 import LoadingSpinner from '../common/LoadingSpinner';
 import MealForm from './MealForm';
@@ -262,7 +263,7 @@ const loadMealsAndCategories = async () => {
                         <div className="h-10 w-10 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
                           {meal.image_path ? (
                             <img
-                              src={meal.image_path}
+                              src={resolveMediaUrl(meal.image_path)}
                               alt={meal.name}
                               className="h-10 w-10 object-cover"
                               onError={(e) => {

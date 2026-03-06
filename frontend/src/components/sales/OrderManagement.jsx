@@ -4,6 +4,7 @@ import  api  from '../../services/api';
 import { Logger } from '../../utils/helpers';
 import { ORDER_STATUS, ORDER_STATUS_DISPLAY } from '../../utils/constants';
 import Modal from '../common/Modal';
+import { resolveMediaUrl } from '../../utils/media';
 
 /**
  * Sales Order Management Component
@@ -418,7 +419,7 @@ const OrderManagement = () => {
                       <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                         {item.image_path ? (
                           <img
-                            src={item.image_path}
+                            src={resolveMediaUrl(item.image_path)}
                             alt={item.meal_name}
                             className="w-full h-full object-cover"
                           />

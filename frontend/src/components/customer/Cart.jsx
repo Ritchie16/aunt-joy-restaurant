@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingCart, Utensils } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { Logger, formatCurrency } from '../../utils/helpers';
+import { resolveMediaUrl } from '../../utils/media';
 
 /**
  * Shopping Cart Sidebar Component
@@ -99,7 +100,7 @@ const Cart = () => {
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                       {item.image_path ? (
                         <img
-                          src={item.image_path}
+                          src={resolveMediaUrl(item.image_path)}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
