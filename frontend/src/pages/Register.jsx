@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
-import { Utensils, Eye, EyeOff, Loader, Check, X, ArrowLeft } from 'lucide-react';
+import { Utensils, Eye, EyeOff, Loader, Check, X } from 'lucide-react';
 import { Logger } from '../utils/helpers';
+import AppToast from '../components/common/AppToast';
+import AuthBackLink from '../components/common/AuthBackLink';
 
 /**
  * Customer Registration Page
@@ -20,6 +22,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState({ show: false, title: '', message: '', type: 'error' });
   
   const { register, error, clearError } = useAuth();
   const navigate = useNavigate();
@@ -39,6 +42,18 @@ const Register = () => {
   React.useEffect(() => {
     return () => clearError();
   }, [clearError]);
+
+  React.useEffect(() => {
+    const errorMessage = errors.submit || error;
+    if (!errorMessage) return;
+
+    setToast({
+      show: true,
+      title: 'Registration failed',
+      message: errorMessage,
+      type: 'error',
+    });
+  }, [errors.submit, error]);
 
   /**
    * Handle form input changes
@@ -131,9 +146,15 @@ const Register = () => {
       
       if (result.success) {
         Logger.info('Registration successful, redirecting to login...');
-        // Show success message and redirect to login
-        alert('Registration successful! Please login with your credentials.');
-        navigate('/login');
+        setToast({
+          show: true,
+          title: 'Account created',
+          message: 'Registration successful. Please sign in with your credentials.',
+          type: 'success',
+        });
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
         setErrors({ submit: result.message });
         Logger.warn(`Registration failed: ${result.message}`);
@@ -162,13 +183,8 @@ const Register = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
-      <Link
-        to="/"
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back
-      </Link>
+    <div className="min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
+      <AuthBackLink />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo and Brand */}
         <div className="flex justify-center">
@@ -193,25 +209,6 @@ const Register = () => {
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-6 px-4 shadow-sm rounded-xl sm:px-8 border border-gray-200">
-          {/* Error Message */}
-          {(error || errors.submit) && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <X className="h-5 w-5 text-red-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Registration Error
-                  </h3>
-                  <div className="mt-1 text-sm text-red-700">
-                    {errors.submit || error}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Registration Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name Field */}
@@ -474,6 +471,15 @@ const Register = () => {
           </p>
         </div>
       </div>
+
+      <AppToast
+        open={toast.show}
+        title={toast.title}
+        message={toast.message}
+        type={toast.type}
+        duration={4200}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 };

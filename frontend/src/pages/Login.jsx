@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
-import { Utensils, Eye, EyeOff, Loader, ArrowLeft } from 'lucide-react';
+import { Utensils, Eye, EyeOff, Loader } from 'lucide-react';
 import { Logger } from '../utils/helpers';
+import AppToast from '../components/common/AppToast';
+import AuthBackLink from '../components/common/AuthBackLink';
 
 /**
  * Unified Login Page for all user roles
@@ -108,13 +110,8 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
-      <Link
-        to="/"
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back
-      </Link>
+    <div className="min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
+      <AuthBackLink />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo and Brand */}
         <div className="flex justify-center">
@@ -133,7 +130,7 @@ const Login = () => {
         </h2>
         
         <p className="mt-2 text-center text-sm text-gray-600">
-          Access your restaurant management dashboard
+          Access your restaurant management portal
         </p>
       </div>
 
@@ -265,25 +262,14 @@ const Login = () => {
         </div>
       </div>
 
-      {toast.show && (
-        <div className="fixed right-4 top-4 z-[70] w-[320px] rounded-lg border border-rose-200 bg-white p-3 shadow-lg">
-          <div className="flex items-start gap-2">
-            <div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-rose-500" />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-rose-700">Login failed</p>
-              <p className="text-sm text-gray-700">{toast.message}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setToast((prev) => ({ ...prev, show: false }))}
-              className="text-gray-400 hover:text-gray-600"
-              aria-label="Close"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+      <AppToast
+        open={toast.show}
+        title="Login failed"
+        message={toast.message}
+        type={toast.type}
+        duration={4200}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 };
