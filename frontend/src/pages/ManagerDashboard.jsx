@@ -22,8 +22,8 @@ const MONTHS = [
 const pctChange = (current, previous) => {
   const c = Number(current || 0);
   const p = Number(previous || 0);
-  if (p === 0 && c === 0) return '0.0%';
-  if (p === 0) return '+100.0%';
+  if (p === 0 && c === 0) return 'No change';
+  if (p === 0 && c > 0) return 'New';
   const change = ((c - p) / p) * 100;
   const sign = change > 0 ? '+' : '';
   return `${sign}${change.toFixed(1)}%`;
