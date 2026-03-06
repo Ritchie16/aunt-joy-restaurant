@@ -25,6 +25,7 @@ import Menu from '../components/customer/Menu';
 import Checkout from '../components/customer/Checkout';
 import { Logger } from '../utils/helpers';
 import { resolveMediaUrl } from '../utils/media';
+import { formatReadableDateTime } from '../utils/dateFormatter';
 
 const STATUS_META = {
   pending: { label: 'Pending', className: 'bg-amber-100 text-amber-800', icon: Clock3 },
@@ -390,7 +391,7 @@ const CustomerDashboard = () => {
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <div>
                           <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
-                          <p className="mt-1 text-sm text-gray-600">{new Date(order.created_at).toLocaleString()} • {order.item_count} items</p>
+                          <p className="mt-1 text-sm text-gray-600">{formatReadableDateTime(order.created_at)} • {order.item_count} items</p>
                           <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
                         </div>
                         <div className="text-left md:text-right">
@@ -423,7 +424,7 @@ const CustomerDashboard = () => {
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <div>
                           <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
-                          <p className="mt-1 text-sm text-gray-600">{new Date(order.created_at).toLocaleString()} • {order.item_count} items</p>
+                          <p className="mt-1 text-sm text-gray-600">{formatReadableDateTime(order.created_at)} • {order.item_count} items</p>
                           <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
                         </div>
                         <div className="text-left md:text-right">
