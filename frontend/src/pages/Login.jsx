@@ -98,13 +98,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
+      <Link
+        to="/"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back
+      </Link>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="mb-4 text-center">
-          <Link to="/" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-            <ArrowLeft className="h-4 w-4" /> Back to Landing
-          </Link>
-        </div>
         {/* Logo and Brand */}
         <div className="flex justify-center">
           <div className="flex items-center space-x-3">
