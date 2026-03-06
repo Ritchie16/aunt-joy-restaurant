@@ -14,6 +14,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
   
   const { login, error, clearError, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +32,15 @@ const Login = () => {
   useEffect(() => {
     return () => clearError();
   }, [clearError]);
+
+  useEffect(() => {
+    if (!error) return;
+    setToast({ show: true, message: error, type: 'error' });
+    const timer = setTimeout(() => {
+      setToast((prev) => ({ ...prev, show: false }));
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [error]);
 
   /**
    * Get dashboard route based on user role
@@ -129,27 +139,6 @@ const Login = () => {
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-6 px-4 shadow-sm rounded-xl sm:px-8 border border-gray-200">
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Authentication Error
-                  </h3>
-                  <div className="mt-1 text-sm text-red-700">
-                    {error}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Login Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email Field */}
@@ -275,6 +264,26 @@ const Login = () => {
           </p>
         </div>
       </div>
+
+      {toast.show && (
+        <div className="fixed right-4 top-4 z-[70] w-[320px] rounded-lg border border-rose-200 bg-white p-3 shadow-lg">
+          <div className="flex items-start gap-2">
+            <div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-rose-500" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-rose-700">Login failed</p>
+              <p className="text-sm text-gray-700">{toast.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setToast((prev) => ({ ...prev, show: false }))}
+              className="text-gray-400 hover:text-gray-600"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

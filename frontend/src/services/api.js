@@ -120,8 +120,15 @@ api.interceptors.response.use(
       data: error.response?.data,
     });
 
-    // Auto logout on 401
-    if (error.response?.status === 401) {
+    // Auto logout on 401 for protected endpoints only.
+    // Do not redirect for auth endpoints (wrong password, invalid credentials).
+    const requestUrl = error.config?.url || "";
+    const isAuthEndpoint =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register") ||
+      requestUrl.includes("/auth/verify");
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       Logger.warn("Authentication failed (401), clearing tokens");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
