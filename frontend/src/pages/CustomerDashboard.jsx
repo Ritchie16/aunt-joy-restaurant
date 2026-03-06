@@ -113,6 +113,14 @@ const CustomerDashboard = () => {
     () => orders.filter((order) => ['pending', 'preparing', 'out_for_delivery'].includes(order.status)),
     [orders]
   );
+  const activeOrders = useMemo(
+    () => orders.filter((order) => ['pending', 'preparing', 'out_for_delivery'].includes(order.status)),
+    [orders]
+  );
+  const orderHistory = useMemo(
+    () => orders.filter((order) => ['delivered', 'cancelled'].includes(order.status)),
+    [orders]
+  );
 
   const navItems = [
     { key: 'home', label: 'Home', icon: Home, href: '/customer' },
@@ -369,29 +377,72 @@ const CustomerDashboard = () => {
       {ordersLoading ? (
         <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-gray-600">Loading your orders...</div>
       ) : orders.length > 0 ? (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const status = STATUS_META[order.status] || STATUS_META.pending;
-            const Icon = status.icon;
-            return (
-              <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
-                    <p className="mt-1 text-sm text-gray-600">{new Date(order.created_at).toLocaleString()} • {order.item_count} items</p>
-                    <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
-                  </div>
+        <div className="space-y-6">
+          <section>
+            <h2 className="mb-3 text-lg font-semibold text-gray-900">Active Orders</h2>
+            {activeOrders.length > 0 ? (
+              <div className="space-y-3">
+                {activeOrders.map((order) => {
+                  const status = STATUS_META[order.status] || STATUS_META.pending;
+                  const Icon = status.icon;
+                  return (
+                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
+                          <p className="mt-1 text-sm text-gray-600">{new Date(order.created_at).toLocaleString()} • {order.item_count} items</p>
+                          <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
+                        </div>
+                        <div className="text-left md:text-right">
+                          <p className="text-lg font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
+                          <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>
+                            <Icon className="h-3.5 w-3.5" /> {status.label}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
+                No active orders at the moment.
+              </div>
+            )}
+          </section>
 
-                  <div className="text-left md:text-right">
-                    <p className="text-lg font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
-                    <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>
-                      <Icon className="h-3.5 w-3.5" /> {status.label}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+          <section>
+            <h2 className="mb-3 text-lg font-semibold text-gray-900">Order History</h2>
+            {orderHistory.length > 0 ? (
+              <div className="space-y-3">
+                {orderHistory.map((order) => {
+                  const status = STATUS_META[order.status] || STATUS_META.pending;
+                  const Icon = status.icon;
+                  return (
+                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
+                          <p className="mt-1 text-sm text-gray-600">{new Date(order.created_at).toLocaleString()} • {order.item_count} items</p>
+                          <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
+                        </div>
+                        <div className="text-left md:text-right">
+                          <p className="text-lg font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
+                          <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>
+                            <Icon className="h-3.5 w-3.5" /> {status.label}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5 text-sm text-gray-600">
+                No past orders yet.
+              </div>
+            )}
+          </section>
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
