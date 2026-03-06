@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
   Logger.debug('Layout rendered');
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
       <Header />
       <main className={`flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 ${isCustomer ? 'max-w-7xl py-4 md:py-6' : 'container py-8'}`}>
         {children}
