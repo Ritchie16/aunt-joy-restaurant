@@ -305,7 +305,7 @@ const OrderManagement = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.item_count} items
+                        {Number(order.total_quantity || order.item_count || 0)} items
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         MK {parseFloat(order.total_amount).toFixed(2)}

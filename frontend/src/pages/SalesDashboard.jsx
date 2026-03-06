@@ -250,7 +250,7 @@ const SalesDashboard = () => {
                           <p className="text-gray-600">{order.customer_phone}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Items: {order.item_count}</p>
+                          <p className="text-gray-600">Items: {Number(order.total_quantity || order.item_count || 0)}</p>
                           <p className="text-gray-600">Total: MK {parseFloat(order.total_amount).toFixed(2)}</p>
                         </div>
                         <div>
