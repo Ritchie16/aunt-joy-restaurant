@@ -1,5 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Download, TrendingUp, Users, Package, DollarSign, RefreshCw } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ComposedChart,
+  Line,
+} from 'recharts';
 import { useAuth } from '../contexts/useAuth';
 import api from '../services/api';
 import { Logger } from '../utils/helpers';
@@ -19,6 +32,12 @@ const MONTHS = [
   { value: 12, label: 'December' },
 ];
 
+const mkCurrency = (amount) =>
+  `MK ${Number(amount || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
 const pctChange = (current, previous) => {
   const c = Number(current || 0);
   const p = Number(previous || 0);
@@ -34,6 +53,50 @@ const prevPeriod = (month, year) => {
   return { month: month - 1, year };
 };
 
+const getDayFromDate = (rawValue) => {
+  if (!rawValue) return null;
+  if (typeof rawValue === 'number') return rawValue;
+  if (typeof rawValue === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawValue)) {
+      return parseInt(rawValue.slice(8, 10), 10);
+    }
+    const parsed = parseInt(rawValue, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
+
+const buildDailySeries = (dailySales, month, year) => {
+  const dayCount = new Date(year, month, 0).getDate();
+  const byDay = new Map();
+
+  (dailySales || []).forEach((row) => {
+    const day = getDayFromDate(row.date || row.day || row.sale_date);
+    if (!day || day < 1 || day > dayCount) return;
+
+    const revenue = Number(row.revenue || row.total_revenue || 0);
+    const orders = Number(row.orders || row.order_count || row.total_orders || 0);
+    const current = byDay.get(day) || { revenue: 0, orders: 0 };
+
+    byDay.set(day, {
+      revenue: current.revenue + revenue,
+      orders: current.orders + orders,
+    });
+  });
+
+  return Array.from({ length: dayCount }, (_, index) => {
+    const day = index + 1;
+    const value = byDay.get(day) || { revenue: 0, orders: 0 };
+    return {
+      day,
+      label: `${day}`,
+      fullLabel: `${day} ${MONTHS[month - 1].label}`,
+      revenue: value.revenue,
+      orders: value.orders,
+    };
+  });
+};
+
 const ManagerDashboard = () => {
   const { user } = useAuth();
   const [reports, setReports] = useState({});
@@ -47,6 +110,26 @@ const ManagerDashboard = () => {
   const [error, setError] = useState('');
 
   const years = useMemo(() => Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i), []);
+
+  const dailySeries = useMemo(
+    () => buildDailySeries(reports.daily_sales, filters.month, filters.year),
+    [reports.daily_sales, filters.month, filters.year]
+  );
+
+  const hasAnyDailyData = useMemo(
+    () => dailySeries.some((row) => row.revenue > 0 || row.orders > 0),
+    [dailySeries]
+  );
+
+  const topItemsChartData = useMemo(
+    () =>
+      (reports.top_selling_items || []).slice(0, 7).map((item) => ({
+        name: item.meal_name?.length > 18 ? `${item.meal_name.slice(0, 18)}...` : item.meal_name,
+        quantity: Number(item.total_quantity || 0),
+        revenue: Number(item.total_revenue || 0),
+      })),
+    [reports.top_selling_items]
+  );
 
   const loadReports = async () => {
     try {
@@ -119,7 +202,7 @@ const ManagerDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Sales Reports & Analytics</h1>
-          <p className="text-gray-600">Welcome, {user?.name}. Analyze sales performance with live data.</p>
+          <p className="text-gray-600">Welcome, {user?.name}. Analyze monthly trends with live data.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -178,7 +261,7 @@ const ManagerDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-xl font-bold text-gray-900">MK {Number(reports.total_revenue || 0).toFixed(2)}</p>
+              <p className="text-xl font-bold text-gray-900">{mkCurrency(reports.total_revenue)}</p>
               <p className="text-sm text-emerald-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.total_revenue, previousReports.total_revenue)} vs prev period
@@ -226,7 +309,7 @@ const ManagerDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Order Value</p>
-              <p className="text-xl font-bold text-gray-900">MK {Number(reports.average_order_value || 0).toFixed(2)}</p>
+              <p className="text-xl font-bold text-gray-900">{mkCurrency(reports.average_order_value)}</p>
               <p className="text-sm text-amber-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.average_order_value, previousReports.average_order_value)} vs prev period
@@ -239,29 +322,105 @@ const ManagerDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Selling Items</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Daily Revenue Trend</h3>
+            <span className="text-xs text-gray-500">{MONTHS[filters.month - 1].label} {filters.year}</span>
+          </div>
 
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-              <p className="text-gray-600 mt-2">Loading data...</p>
+              <p className="text-gray-600 mt-2">Loading chart...</p>
             </div>
-          ) : reports.top_selling_items?.length > 0 ? (
-            <div className="space-y-4">
-              {reports.top_selling_items.map((item, index) => (
-                <div key={item.meal_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <span className="bg-primary-600 text-white text-sm font-medium rounded-full h-6 w-6 flex items-center justify-center">{index + 1}</span>
-                    <div>
-                      <p className="font-medium text-gray-900">{item.meal_name}</p>
-                      <p className="text-sm text-gray-600">{item.total_quantity} sold</p>
-                    </div>
-                  </div>
-                  <span className="font-semibold text-primary-600">MK {Number(item.total_revenue).toFixed(2)}</span>
-                </div>
-              ))}
+          ) : (
+            <div className="h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dailySeries} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`} />
+                  <Tooltip
+                    formatter={(value) => mkCurrency(value)}
+                    labelFormatter={(value, payload) => payload?.[0]?.payload?.fullLabel || value}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#0f766e" strokeWidth={2.5} fill="url(#revGradient)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {!isLoading && !hasAnyDailyData && (
+            <p className="text-sm text-gray-500 mt-2">No daily sales data for this month yet.</p>
+          )}
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Orders vs Revenue (Daily)</h3>
+            <span className="text-xs text-gray-500">Dual-axis view</span>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="text-gray-600 mt-2">Loading chart...</p>
+            </div>
+          ) : (
+            <div className="h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={dailySeries} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
+                  <YAxis yAxisId="left" tick={{ fontSize: 11 }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`} />
+                  <Tooltip
+                    labelFormatter={(value, payload) => payload?.[0]?.payload?.fullLabel || value}
+                    formatter={(value, name) => {
+                      if (name === 'Revenue') return mkCurrency(value);
+                      return value;
+                    }}
+                  />
+                  <Bar yAxisId="left" dataKey="orders" name="Orders" fill="#93c5fd" radius={[5, 5, 0, 0]} />
+                  <Line yAxisId="right" type="monotone" dataKey="revenue" name="Revenue" stroke="#0f766e" strokeWidth={2.5} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Selling Items (Quantity)</h3>
+
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="text-gray-600 mt-2">Loading chart...</p>
+            </div>
+          ) : topItemsChartData.length > 0 ? (
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={topItemsChartData} layout="vertical" margin={{ top: 4, right: 14, left: 14, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
+                  <Tooltip
+                    formatter={(value, name) => {
+                      if (name === 'Revenue') return mkCurrency(value);
+                      return value;
+                    }}
+                  />
+                  <Bar dataKey="quantity" name="Quantity" fill="#0ea5e9" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           ) : (
             <div className="text-center py-8 text-gray-600">No sales data available for this period.</div>
@@ -269,30 +428,30 @@ const ManagerDashboard = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Sales</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Item Revenue</h3>
 
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-              <p className="text-gray-600 mt-2">Loading data...</p>
+              <p className="text-gray-600 mt-2">Loading chart...</p>
             </div>
-          ) : reports.daily_sales?.length > 0 ? (
+          ) : reports.top_selling_items?.length > 0 ? (
             <div className="space-y-3">
-              {reports.daily_sales.map((day) => {
-                const percent = (Number(day.revenue || 0) / (Number(reports.max_daily_revenue || 1))) * 100;
-                return (
-                  <div key={day.date} className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-gray-600 w-24">{day.date}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div className="bg-primary-600 h-2 rounded-full" style={{ width: `${Math.min(100, percent)}%` }} />
+              {reports.top_selling_items.slice(0, 6).map((item, index) => (
+                <div key={item.meal_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <span className="bg-primary-600 text-white text-xs font-semibold rounded-full h-6 w-6 flex items-center justify-center">{index + 1}</span>
+                    <div>
+                      <p className="font-medium text-gray-900">{item.meal_name}</p>
+                      <p className="text-xs text-gray-600">{item.total_quantity} sold</p>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 w-24 text-right">MK {Number(day.revenue).toFixed(2)}</span>
                   </div>
-                );
-              })}
+                  <span className="font-semibold text-primary-600">{mkCurrency(item.total_revenue)}</span>
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-600">No daily sales data available.</div>
+            <div className="text-center py-8 text-gray-600">No top-selling items for this period.</div>
           )}
         </div>
       </div>
