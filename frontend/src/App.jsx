@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   if (!isAuthenticated) {
     Logger.warn('Access denied: User not authenticated');
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
@@ -67,7 +67,7 @@ const DashboardRedirect = () => {
     case 'customer':
       return <Navigate to="/customer" replace />;
     default:
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/" replace />;
   }
 };
 

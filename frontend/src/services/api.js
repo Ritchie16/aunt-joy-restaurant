@@ -127,7 +127,7 @@ api.interceptors.response.use(
       localStorage.removeItem("user");
 
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.location.replace("/");
       }
     }
 

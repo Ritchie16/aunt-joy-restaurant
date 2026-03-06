@@ -28,8 +28,9 @@ const Header = () => {
   const handleLogout = () => {
     Logger.info(`User logout: ${user?.email}`);
     logout();
-    navigate('/login');
     setIsProfileMenuOpen(false);
+    // Use hard redirect to avoid route-guard race conditions after auth state reset.
+    window.location.replace('/');
   };
 
   /**
