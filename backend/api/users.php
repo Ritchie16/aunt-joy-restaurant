@@ -30,12 +30,12 @@ $logger = new Logger();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
-    $path = $_SERVER['REQUEST_URI'];
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
     $logger->info("Users API Request: {$method} {$path}");
 
     // Extract endpoint
-    $endpoint = str_replace('/api/', '', $path);
+    $endpoint = ltrim(substr($path, strlen('/api/')), '/');
 
     switch ($method) {
         case 'GET':

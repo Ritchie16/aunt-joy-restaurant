@@ -31,17 +31,21 @@ $logger = new Logger();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
-    $path = $_SERVER['REQUEST_URI'];
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
     $logger->info("Orders API Request: {$method} {$path}");
 
     // Extract endpoint
-    $endpoint = str_replace('/api/', '', $path);
+    $endpoint = ltrim(substr($path, strlen('/api/')), '/');
 
     switch ($method) {
         case 'GET':
             if ($endpoint === 'orders') {
                 $orderController->getAllOrders();
+            } elseif ($endpoint === 'orders/my') {
+                $orderController->getCustomerOrders();
+            } elseif (preg_match('/^orders\/(\d+)$/', $endpoint, $matches)) {
+                $orderController->getOrderDetails($matches[1]);
             } else {
                 Response::error('Endpoint not found', [], 404);
             }

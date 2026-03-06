@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Utensils, Star } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Search, Filter, Utensils } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import MealCard from './MealCard';
 import  api  from '../../services/api';
@@ -16,12 +17,20 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchParams] = useSearchParams();
   
   const { addToCart } = useCart();
 
   useEffect(() => {
     loadMenuData();
   }, []);
+
+  useEffect(() => {
+    const queryCategory = searchParams.get('category');
+    if (queryCategory) {
+      setSelectedCategory(queryCategory);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     filterMeals();
@@ -36,7 +45,7 @@ const Menu = () => {
       Logger.info('Loading menu data...');
       
       // In a real app, these would be separate API calls
-      const mealsResponse = await api.get('/meals');
+      const mealsResponse = await api.get('/meals-available');
       const categoriesResponse = await api.get('/categories');
       
       if (mealsResponse.data.success) {

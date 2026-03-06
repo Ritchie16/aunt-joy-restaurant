@@ -7,7 +7,7 @@
 // Set CORS headers first
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173'); // Changed to 5173
-header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Credentials: true');
 
@@ -30,12 +30,12 @@ $logger = new Logger();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
-    $path = $_SERVER['REQUEST_URI'];
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
     $logger->info("Auth API Request: {$method} {$path}");
 
     // Extract endpoint from path
-    $endpoint = str_replace('/api/auth/', '', $path);
+    $endpoint = ltrim(substr($path, strlen('/api/auth/')), '/');
 
     switch ($endpoint) {
         case 'login':

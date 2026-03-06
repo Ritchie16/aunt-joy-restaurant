@@ -3,8 +3,8 @@
  * PDF Export Utility
  * Generates PDF reports using TCPDF
  */
-require_once '../vendor/autoload.php'; // For Composer dependencies
-require_once '../utils/Logger.php';
+require_once __DIR__ . '/../vendor/autoload.php'; // For Composer dependencies
+require_once __DIR__ . '/Logger.php';
 
 // Use TCPDF if available, otherwise provide fallback
 if (class_exists('TCPDF')) {

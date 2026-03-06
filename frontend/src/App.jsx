@@ -85,7 +85,7 @@ function App() {
             <Routes>
               {/* Public Routes - Landing Page accessible to all */}
               <Route path="/" element={
-                <PublicRoute allowAuthenticated={true}>
+                <PublicRoute>
                   <LandingPage />
                 </PublicRoute>
               } />
@@ -118,8 +118,8 @@ function App() {
                     <Routes>
                       <Route index element={<CustomerDashboard />} />
                       <Route path="menu" element={<CustomerDashboard />} />
-                      <Route path="cart" element={<CustomerDashboard />} />
                       <Route path="orders" element={<CustomerDashboard />} />
+                      <Route path="checkout" element={<CustomerDashboard />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>

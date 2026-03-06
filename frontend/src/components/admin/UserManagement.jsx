@@ -12,6 +12,7 @@ const UserManagement = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -27,37 +28,14 @@ const UserManagement = () => {
       Logger.info('Loading users...');
 
       const response = await api.get('/users');
-      
-      // Handle corrupted JSON response with warnings
-      let responseData = response.data;
-      
-      // If response.data is a string (due to PHP warnings), try to extract JSON
-      if (typeof responseData === 'string') {
-        console.log('🔍 [DEBUG] Response is string, extracting JSON...');
-        
-        // Try to find JSON in the string
-        const jsonMatch = responseData.match(/\{.*\}/s);
-        if (jsonMatch) {
-          try {
-            responseData = JSON.parse(jsonMatch[0]);
-            console.log('🔍 [DEBUG] Extracted JSON:', responseData);
-          } catch (parseError) {
-            console.error('🔍 [DEBUG] Failed to parse JSON:', parseError);
-          }
-        }
-      }
-      
-      // Now check the actual data structure
-      if (responseData && responseData.success) {
-        console.log('🔍 [DEBUG] Setting users with data:', responseData.data);
-        setUsers(responseData.data);
-        Logger.info(`Loaded ${responseData.data.length} users`);
+
+      if (response.data && response.data.success) {
+        setUsers(response.data.data || []);
+        Logger.info(`Loaded ${response.data.data?.length || 0} users`);
       } else {
-        console.log('🔍 [DEBUG] API call failed or invalid structure:', responseData);
-        setError(responseData?.message || 'API call failed');
+        setError(response.data?.message || 'API call failed');
       }
     } catch (error) {
-      console.error('🔍 [DEBUG] Error loading users:', error);
       const errorMsg = error.message || 'Failed to load users';
       setError(errorMsg);
       Logger.error('Error loading users:', error);
@@ -91,8 +69,14 @@ const UserManagement = () => {
       filtered = filtered.filter(user => user.role === roleFilter);
     }
 
+    if (statusFilter === 'active') {
+      filtered = filtered.filter((user) => Boolean(user.is_active));
+    } else if (statusFilter === 'inactive') {
+      filtered = filtered.filter((user) => !Boolean(user.is_active));
+    }
+
     setFilteredUsers(filtered);
-  }, [users, searchTerm, roleFilter]);
+  }, [users, searchTerm, roleFilter, statusFilter]);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -250,8 +234,8 @@ const UserManagement = () => {
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
               >
                 <option value="all">All Roles</option>

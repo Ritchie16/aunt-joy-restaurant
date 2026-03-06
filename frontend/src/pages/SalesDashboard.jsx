@@ -193,7 +193,7 @@ const SalesDashboard = () => {
                   <p className="text-sm text-gray-600">{statusInfo.label}</p>
                   <p className="text-2xl font-bold text-gray-900">{count}</p>
                 </div>
-                <div className={`p-3 rounded-lg ${statusInfo.color.replace('text-', '')}`}>
+                <div className={`p-3 rounded-lg ${statusInfo.color.split(' ')[0]}`}>
                   <Icon className="h-6 w-6" />
                 </div>
               </div>

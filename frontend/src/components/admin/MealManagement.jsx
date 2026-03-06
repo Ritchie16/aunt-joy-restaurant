@@ -59,40 +59,14 @@ const loadMealsAndCategories = async () => {
       setError(mealsResponse.data.message || 'Failed to load meals');
     }
     
-    // Load categories - IMPORTANT: Check your actual API endpoint
-    console.log('📂 Loading categories...');
-    
-    // Try different endpoints to find the correct one
-    const categoryEndpoints = ['/categories', '/meals/categories', '/meals?categories=true'];
-    
-    let categoriesResponse = null;
-    for (const endpoint of categoryEndpoints) {
-      try {
-        console.log(`   Trying endpoint: ${endpoint}`);
-        categoriesResponse = await api.get(endpoint);
-        console.log(`   ✅ ${endpoint} responded with status:`, categoriesResponse.status);
-        
-        if (categoriesResponse.data.success) {
-          console.log(`✅ Loaded ${categoriesResponse.data.data?.length || 0} categories`);
-          setCategories(categoriesResponse.data.data || []);
-          break;
-        }
-      } catch (err) {
-        console.log(`   ❌ ${endpoint} failed:`, err.message);
-      }
-    }
-    
-    if (!categoriesResponse || !categoriesResponse.data.success) {
-      console.warn('⚠️ Could not load categories from any endpoint');
-      // Use the categories from your database dump if API fails
-      const fallbackCategories = [
-        {"id":1,"name":"Breakfast","description":"Start your day with our delicious breakfast options"},
-        {"id":2,"name":"Lunch","description":"Hearty meals for your midday break"},
-        {"id":3,"name":"Dinner","description":"Perfect meals to end your day"},
-        {"id":4,"name":"Drinks","description":"Refreshing beverages and drinks"},
-        {"id":5,"name":"Desserts","description":"Sweet treats to satisfy your cravings"}
-      ];
-      setCategories(fallbackCategories);
+    // Load categories
+    console.log('📂 Loading categories from /categories...');
+    const categoriesResponse = await api.get('/categories');
+    if (categoriesResponse.data.success) {
+      console.log(`✅ Loaded ${categoriesResponse.data.data?.length || 0} categories`);
+      setCategories(categoriesResponse.data.data || []);
+    } else {
+      setError(categoriesResponse.data.message || 'Failed to load categories');
     }
     
     console.groupEnd();
@@ -288,15 +262,13 @@ const loadMealsAndCategories = async () => {
                         <div className="h-10 w-10 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
                           {meal.image_path ? (
                             <img
-  src={meal.image_path ? `http://localhost:8000${meal.image_path}` : ''}
-  alt={meal.name}
-  className="h-10 w-10 object-cover"
-  onError={(e) => {
-    // Fallback if image fails to load
-    e.target.style.display = 'none';
-    e.target.parentElement.innerHTML = '<div class="h-10 w-10 flex items-center justify-center bg-gray-100"><Utensils className="h-5 w-5 text-gray-400" /></div>';
-  }}
-/>
+                              src={meal.image_path}
+                              alt={meal.name}
+                              className="h-10 w-10 object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
                           ) : (
                             <div className="h-10 w-10 flex items-center justify-center bg-gray-100">
                               <Utensils className="h-5 w-5 text-gray-400" />

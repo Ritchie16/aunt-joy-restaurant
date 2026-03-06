@@ -40,7 +40,7 @@ try {
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
     // Extract endpoint
-    $endpoint = str_replace('/api/', '', $path);
+    $endpoint = ltrim(substr($path, strlen('/api/')), '/');
 
     // Remove trailing slash
     $endpoint = rtrim($endpoint, '/');

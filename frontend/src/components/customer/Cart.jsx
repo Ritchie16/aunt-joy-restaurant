@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingCart, Utensils } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { Logger, formatCurrency } from '../../utils/helpers';
@@ -7,6 +8,7 @@ import { Logger, formatCurrency } from '../../utils/helpers';
  * Shopping Cart Sidebar Component
  */
 const Cart = () => {
+  const navigate = useNavigate();
   const { 
     cartItems, 
     isCartOpen, 
@@ -162,7 +164,7 @@ const Cart = () => {
                   onClick={() => {
                     Logger.info('Proceeding to checkout');
                     closeCart();
-                    // Navigate to checkout page
+                    navigate('/customer/checkout');
                   }}
                   className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
                 >

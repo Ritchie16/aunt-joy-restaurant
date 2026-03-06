@@ -209,7 +209,7 @@ class MealController
             // Authenticate and get current user
             $currentUser = $this->authMiddleware->authenticate();
 
-            $this->logger->info("Current user info: " . $currentUser);
+            $this->logger->info("Current user info: " . json_encode($currentUser));
 
             if (!$currentUser) {
                 $this->logger->debug("Failed to check the current user, current user not found");

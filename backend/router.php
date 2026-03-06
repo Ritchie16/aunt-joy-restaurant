@@ -9,7 +9,7 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $path = parse_url($request_uri, PHP_URL_PATH);
 
 // Set CORS headers for all responses
-header('Access-Control-Allow-Origin: http://localhost:3000');
+header('Access-Control-Allow-Origin: http://localhost:5173');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Credentials: true');
@@ -59,6 +59,18 @@ if (strpos($path, '/api/') === 0) {
             require __DIR__ . '/api/meals.php';
             break;
 
+        case $api_path === '/meals' && $_SERVER['REQUEST_METHOD'] === 'POST':
+            require __DIR__ . '/api/meals.php';
+            break;
+
+        case preg_match('#^/meals/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'PUT':
+            require __DIR__ . '/api/meals.php';
+            break;
+
+        case preg_match('#^/meals/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'DELETE':
+            require __DIR__ . '/api/meals.php';
+            break;
+
         case $api_path === '/meals-available' && $_SERVER['REQUEST_METHOD'] === 'GET':
             require __DIR__ . '/api/meals.php';
             break;
@@ -71,6 +83,14 @@ if (strpos($path, '/api/') === 0) {
             require __DIR__ . '/api/orders.php';
             break;
 
+        case $api_path === '/orders/my' && $_SERVER['REQUEST_METHOD'] === 'GET':
+            require __DIR__ . '/api/orders.php';
+            break;
+
+        case preg_match('#^/orders/(\d+)$#', $api_path) && $_SERVER['REQUEST_METHOD'] === 'GET':
+            require __DIR__ . '/api/orders.php';
+            break;
+
         case $api_path === '/orders' && $_SERVER['REQUEST_METHOD'] === 'POST':
             require __DIR__ . '/api/orders.php';
             break;
@@ -80,6 +100,10 @@ if (strpos($path, '/api/') === 0) {
             break;
 
         case $api_path === '/reports' && $_SERVER['REQUEST_METHOD'] === 'GET':
+            require __DIR__ . '/api/reports.php';
+            break;
+
+        case $api_path === '/reports/export' && $_SERVER['REQUEST_METHOD'] === 'GET':
             require __DIR__ . '/api/reports.php';
             break;
 

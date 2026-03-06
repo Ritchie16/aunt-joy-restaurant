@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
-import { Utensils, Eye, EyeOff, Loader, Check, X } from 'lucide-react';
+import { Utensils, Eye, EyeOff, Loader, Check, X, ArrowLeft } from 'lucide-react';
 import { Logger } from '../utils/helpers';
 
 /**
@@ -162,8 +162,13 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="mb-4 text-center">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+            <ArrowLeft className="h-4 w-4" /> Back to Landing
+          </Link>
+        </div>
         {/* Logo and Brand */}
         <div className="flex justify-center">
           <div className="flex items-center space-x-3">

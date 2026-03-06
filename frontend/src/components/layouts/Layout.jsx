@@ -1,17 +1,20 @@
 import React from 'react';
 import Header from './Header';
+import Cart from '../customer/Cart';
+import { useAuth } from '../../contexts/useAuth';
 import { Logger } from '../../utils/helpers';
 
 /**
  * Main Layout Component wrapping all pages
  */
 const Layout = ({ children }) => {
+  const { isCustomer } = useAuth();
   Logger.debug('Layout rendered');
   
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className={`flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 ${isCustomer ? 'max-w-7xl py-4 md:py-6' : 'container py-8'}`}>
         {children}
       </main>
       
@@ -32,6 +35,8 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </footer>
+
+      {isCustomer && <Cart />}
     </div>
   );
 };

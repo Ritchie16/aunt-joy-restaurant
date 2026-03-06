@@ -2,11 +2,12 @@
 /**
  * Order Controller - Handles all order-related operations
  */
-require_once '../models/Order.php';
-require_once '../models/User.php';
-require_once '../middleware/Validation.php';
-require_once '../utils/Response.php';
-require_once '../utils/Logger.php';
+require_once __DIR__ . '/../models/Order.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../middleware/Validation.php';
+require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../utils/Logger.php';
+require_once __DIR__ . '/AuthController.php';
 
 class OrderController {
     private $orderModel;

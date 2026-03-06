@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
-import { Utensils, Eye, EyeOff, Loader } from 'lucide-react';
+import { Utensils, Eye, EyeOff, Loader, ArrowLeft } from 'lucide-react';
 import { Logger } from '../utils/helpers';
 
 /**
@@ -15,7 +15,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login, error, clearError, isAuthenticated } = useAuth();
+  const { login, error, clearError, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -36,8 +36,17 @@ const Login = () => {
    * Get dashboard route based on user role
    */
   const getDashboardRoute = () => {
-    // Default route, will be updated after login
-    return '/customer';
+    switch (user?.role) {
+      case 'admin':
+        return '/admin';
+      case 'manager':
+        return '/manager';
+      case 'sales':
+        return '/sales';
+      case 'customer':
+      default:
+        return '/customer';
+    }
   };
 
   /**
@@ -89,8 +98,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="mb-4 text-center">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+            <ArrowLeft className="h-4 w-4" /> Back to Landing
+          </Link>
+        </div>
         {/* Logo and Brand */}
         <div className="flex justify-center">
           <div className="flex items-center space-x-3">

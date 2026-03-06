@@ -31,24 +31,24 @@ $logger = new Logger();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
-    $path = $_SERVER['REQUEST_URI'];
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
     $logger->info("Reports API Request: {$method} {$path}");
 
     // Extract endpoint
-    $endpoint = str_replace('/api/', '', $path);
+    $endpoint = ltrim(substr($path, strlen('/api/')), '/');
 
     switch ($method) {
         case 'GET':
             if ($endpoint === 'reports') {
                 $reportController->generateSalesReport();
-            } elseif ($endpoint === 'reports-export') {
+            } elseif ($endpoint === 'reports/export' || $endpoint === 'reports-export') {
                 $reportController->exportReport();
-            } elseif ($endpoint === 'reports-financial') {
+            } elseif ($endpoint === 'reports/financial' || $endpoint === 'reports-financial') {
                 $reportController->getFinancialSummary();
-            } elseif ($endpoint === 'reports-categories') {
+            } elseif ($endpoint === 'reports/categories' || $endpoint === 'reports-categories') {
                 $reportController->getPopularCategories();
-            } elseif ($endpoint === 'reports-customer-insights') {
+            } elseif ($endpoint === 'reports/customer-insights' || $endpoint === 'reports-customer-insights') {
                 $reportController->getCustomerInsights();
             } else {
                 Response::error('Endpoint not found', [], 404);

@@ -3,8 +3,8 @@
  * Excel Export Utility
  * Generates Excel reports using PhpSpreadsheet
  */
-require_once '../vendor/autoload.php'; // For Composer dependencies
-require_once '../utils/Logger.php';
+require_once __DIR__ . '/../vendor/autoload.php'; // For Composer dependencies
+require_once __DIR__ . '/Logger.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
