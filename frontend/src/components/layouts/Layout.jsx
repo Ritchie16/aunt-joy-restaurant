@@ -12,25 +12,25 @@ const Layout = ({ children }) => {
   Logger.debug('Layout rendered');
   
   return (
-    <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
+    <div className="min-h-screen bg-[#f1f4f6] flex flex-col">
       <Header />
-      <main className={`flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 ${isCustomer ? 'max-w-7xl py-4 md:py-6' : 'container py-8'}`}>
+      <main className={`flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 ${isCustomer ? 'max-w-6xl py-4 md:py-5' : 'max-w-6xl py-6'}`}>
         {children}
       </main>
       
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <span className="text-lg font-bold text-primary-600">
+              <span className="text-base font-bold text-primary-600">
                 Aunt Joy's Restaurant
               </span>
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-xs text-gray-600">
               <p>&copy; {new Date().getFullYear()} Aunt Joy's Restaurant. All rights reserved.</p>
-              <p className="text-xs mt-1">Mzuzu, Malawi</p>
+              <p className="mt-1">Mzuzu, Malawi</p>
             </div>
           </div>
         </div>

@@ -84,35 +84,35 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Admin Dashboard</h1>
           <p className="text-gray-600">Welcome back, {user?.name}. Manage your restaurant operations.</p>
         </div>
 
         <button
           onClick={loadDashboardStats}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 self-start rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+          className="inline-flex items-center gap-2 self-start rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh Stats
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.label} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={card.label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{card.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{isLoading ? '...' : card.value}</p>
+                  <p className="text-xl font-bold text-gray-900 mt-1">{isLoading ? '...' : card.value}</p>
                 </div>
-                <div className={`p-3 rounded-lg ${card.iconClass}`}>
-                  <Icon className="h-6 w-6" />
+                <div className={`p-2.5 rounded-lg ${card.iconClass}`}>
+                  <Icon className="h-5 w-5" />
                 </div>
               </div>
             </div>
@@ -120,16 +120,16 @@ const AdminDashboard = () => {
         })}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
         <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6">
+          <nav className="flex space-x-6 px-5">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
+                  className={`py-3 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
                     activeTab === tab.id
                       ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-5">
           {activeTab === 'overview' && (
             <div className="text-center py-12">
               <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />

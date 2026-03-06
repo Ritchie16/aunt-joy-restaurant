@@ -75,27 +75,27 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="bg-white/95 backdrop-blur sticky top-0 z-50 border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14">
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link 
               to={getDashboardRoute()} 
               className="flex items-center space-x-2 text-primary-600 hover:text-primary-700"
             >
-              <Utensils className="h-8 w-8" />
-              <span className="text-xl font-bold">Aunt Joy's Restaurant</span>
+              <Utensils className="h-7 w-7" />
+              <span className="text-lg font-bold">Aunt Joy's Restaurant</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {user && (
               <>
                 <Link
                   to={getDashboardRoute()}
-                  className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                  className="text-gray-700 hover:text-primary-600 text-sm font-semibold transition-colors"
                 >
                   {isCustomer ? 'Home' : 'Dashboard'}
                 </Link>
@@ -103,7 +103,7 @@ const Header = () => {
                 {isCustomer && (
                   <Link
                     to="/customer/menu"
-                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                    className="text-gray-700 hover:text-primary-600 text-sm font-semibold transition-colors"
                   >
                     Menu
                   </Link>
@@ -112,7 +112,7 @@ const Header = () => {
                 {isCustomer && (
                   <Link
                     to="/customer/orders"
-                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                    className="text-gray-700 hover:text-primary-600 text-sm font-semibold transition-colors"
                   >
                     My Orders
                   </Link>
@@ -128,12 +128,12 @@ const Header = () => {
             {isCustomer && (
               <button
                 onClick={() => navigate('/customer/cart')}
-                className="relative p-2 text-gray-700 hover:text-primary-600 transition-colors"
+                className="relative p-1.5 text-gray-700 hover:text-primary-600 transition-colors"
                 aria-label="Shopping cart"
               >
-                <ShoppingCart className="h-6 w-6" />
+                <ShoppingCart className="h-5 w-5" />
                 {getTotalItems() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary-600 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
                     {getTotalItems()}
                   </span>
                 )}
@@ -145,18 +145,18 @@ const Header = () => {
               <div className="relative">
                 <button
                   onClick={toggleProfileMenu}
-                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                   aria-label="User menu"
                 >
-                  <User className="h-6 w-6 text-gray-600" />
-                  <span className="hidden sm:block text-sm font-medium text-gray-700">
+                  <User className="h-5 w-5 text-gray-600" />
+                  <span className="hidden sm:block text-sm font-semibold text-gray-700">
                     {user.name}
                   </span>
                 </button>
 
                 {/* Profile Dropdown */}
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-md border border-gray-200 py-1 z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-sm font-medium text-gray-900">{user.name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
@@ -192,9 +192,9 @@ const Header = () => {
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>

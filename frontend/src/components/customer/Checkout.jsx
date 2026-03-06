@@ -174,11 +174,11 @@ const Checkout = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Checkout</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Checkout</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Summary */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
           
           {cartItems.length === 0 ? (
@@ -191,7 +191,7 @@ const Checkout = () => {
               {/* Cart Items */}
               <div className="space-y-4 mb-6">
                 {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                         {item.image_path ? (
@@ -238,7 +238,7 @@ const Checkout = () => {
         </div>
 
         {/* Checkout Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Delivery Information</h2>
           
           <form onSubmit={handleSubmitOrder} className="space-y-6">

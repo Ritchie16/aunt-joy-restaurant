@@ -204,7 +204,7 @@ const loadMealsAndCategories = async () => {
    return (
     <div>
       {/* Header and Actions */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-5">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Meal Management</h2>
           <p className="text-gray-600">Manage your restaurant menu items</p>
@@ -212,7 +212,7 @@ const loadMealsAndCategories = async () => {
         
         <button
           onClick={handleCreateMeal}
-          className="mt-4 md:mt-0 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
+          className="mt-4 md:mt-0 bg-primary-600 text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-primary-700 transition-colors flex items-center space-x-2"
         >
           <Plus className="h-4 w-4" />
           <span>Add Meal</span>
@@ -222,7 +222,7 @@ const loadMealsAndCategories = async () => {
       {/* Search and Filter - existing code ... */}
 
       {/* Meals Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {isLoading ? (
           <div className="text-center py-12">
             <LoadingSpinner size="lg" text="Loading meals..." />

@@ -42,9 +42,9 @@ const MealCard = ({ meal, onAddToCart }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300">
       {/* Meal Image */}
-      <div className="relative h-48 bg-gray-200">
+      <div className="relative h-40 bg-gray-200">
         {meal.image_path ? (
           <img
             src={resolveMediaUrl(meal.image_path)}
@@ -68,17 +68,17 @@ const MealCard = ({ meal, onAddToCart }) => {
       </div>
 
       {/* Meal Details */}
-      <div className="p-4">
+      <div className="p-3.5">
         {/* Meal Name and Price */}
         <div className="mb-3">
-          <h3 className="font-semibold text-gray-900 text-lg mb-1 line-clamp-1">
+          <h3 className="font-semibold text-gray-900 text-base mb-1 line-clamp-1">
             {meal.name}
           </h3>
           <p className="text-gray-600 text-sm line-clamp-2 mb-2">
             {meal.description}
           </p>
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-primary-600">
+            <span className="text-xl font-bold text-primary-600">
               MK {parseFloat(meal.price).toFixed(2)}
             </span>
             {/* Rating would go here */}
@@ -91,11 +91,11 @@ const MealCard = ({ meal, onAddToCart }) => {
             {/* Quantity Selector */}
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 font-medium">Quantity:</span>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2.5">
                 <button
                   onClick={decreaseQuantity}
                   disabled={quantity <= 1}
-                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Minus className="h-4 w-4" />
                 </button>
@@ -104,7 +104,7 @@ const MealCard = ({ meal, onAddToCart }) => {
                 </span>
                 <button
                   onClick={increaseQuantity}
-                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -115,7 +115,7 @@ const MealCard = ({ meal, onAddToCart }) => {
             <button
               onClick={handleAddToCart}
               disabled={isAdding}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-primary-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
             >
               {isAdding ? (
                 <>
@@ -133,7 +133,7 @@ const MealCard = ({ meal, onAddToCart }) => {
         ) : (
           <button
             disabled
-            className="w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed"
+            className="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg text-sm font-semibold cursor-not-allowed"
           >
             Out of Stock
           </button>

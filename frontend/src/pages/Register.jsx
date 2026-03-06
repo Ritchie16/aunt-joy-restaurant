@@ -162,7 +162,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f3f5f7] via-[#eef2f6] to-[#f7f8fa] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f1f4f6] flex flex-col justify-center py-8 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="mb-4 text-center">
           <Link to="/" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
@@ -172,10 +172,10 @@ const Register = () => {
         {/* Logo and Brand */}
         <div className="flex justify-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-primary-600 p-3 rounded-lg">
-              <Utensils className="h-8 w-8 text-white" />
+            <div className="bg-primary-600 p-2.5 rounded-lg">
+              <Utensils className="h-7 w-7 text-white" />
             </div>
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-gray-900">
               Aunt Joy's
             </span>
           </div>
@@ -190,8 +190,8 @@ const Register = () => {
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10 border border-gray-200">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-6 px-4 shadow-sm rounded-xl sm:px-8 border border-gray-200">
           {/* Error Message */}
           {(error || errors.submit) && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -421,7 +421,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
                   <>
@@ -451,7 +451,7 @@ const Register = () => {
             <div className="mt-6">
               <Link
                 to="/login"
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="w-full flex justify-center py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
                 Sign in to your account
               </Link>

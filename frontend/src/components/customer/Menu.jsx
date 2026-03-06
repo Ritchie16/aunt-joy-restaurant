@@ -133,28 +133,28 @@ const Menu = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Our Menu</h1>
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-3">Our Menu</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
           Discover our delicious selection of meals prepared with fresh ingredients and traditional recipes
         </p>
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
                 placeholder="Search meals by name or description..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-sm"
               />
             </div>
           </div>
@@ -162,11 +162,11 @@ const Menu = () => {
           {/* Category Filter */}
           <div className="md:w-64">
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <select
                 value={selectedCategory}
                 onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white transition-colors"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white transition-colors text-sm"
               >
                 <option value="all">All Categories</option>
                 {categories.map(category => (
@@ -192,8 +192,8 @@ const Menu = () => {
       {!isLoading && (
         <>
           {/* Results Count */}
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-600">
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-sm text-gray-600">
               Showing {filteredMeals.length} of {meals.length} meals
             </p>
             {(selectedCategory !== 'all' || searchTerm) && (
@@ -211,7 +211,7 @@ const Menu = () => {
 
           {/* Meals Grid */}
           {filteredMeals.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredMeals.map(meal => (
                 <MealCard
                   key={meal.id}

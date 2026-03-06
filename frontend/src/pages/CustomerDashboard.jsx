@@ -152,18 +152,18 @@ const CustomerDashboard = () => {
   );
 
   const renderHome = () => (
-    <div className="space-y-6 pb-24 md:pb-8">
-      <section className="rounded-3xl bg-gradient-to-br from-emerald-500 via-green-500 to-lime-500 p-6 text-white shadow-lg">
+    <div className="space-y-5 pb-24 md:pb-8">
+      <section className="rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 p-5 text-white shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm text-emerald-50">Delivering in Mzuzu</p>
-            <h1 className="mt-1 text-2xl font-bold md:text-3xl">Hungry, {user?.name?.split(' ')[0]}?</h1>
+            <h1 className="mt-1 text-xl font-bold md:text-2xl">Hungry, {user?.name?.split(' ')[0]}?</h1>
             <p className="mt-2 text-sm text-emerald-50 md:text-base">Fresh meals from Aunt Joy&apos;s kitchen, straight to your door.</p>
           </div>
 
           <Link
             to="/customer/cart"
-            className="inline-flex items-center gap-2 self-start rounded-xl bg-white/95 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-white"
+            className="inline-flex items-center gap-2 self-start rounded-lg bg-white/95 px-3.5 py-2 text-sm font-semibold text-emerald-700 hover:bg-white"
           >
             <ShoppingCart className="h-4 w-4" /> Cart ({getTotalItems()})
           </Link>
@@ -171,13 +171,13 @@ const CustomerDashboard = () => {
 
         <button
           onClick={() => navigate('/customer/menu')}
-          className="mt-5 flex w-full items-center gap-3 rounded-xl bg-white px-4 py-3 text-left text-gray-500"
+          className="mt-4 flex w-full items-center gap-3 rounded-lg bg-white px-3.5 py-2.5 text-left text-sm text-gray-500"
         >
           <Search className="h-5 w-5" /> Search meals or categories
         </button>
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+      <section className="rounded-xl border border-gray-200 bg-white p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Categories</h2>
           <Link to="/customer/menu" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">See all</Link>
@@ -209,7 +209,7 @@ const CustomerDashboard = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((skeleton) => (
               <div key={skeleton} className="h-44 animate-pulse rounded-2xl bg-gray-200" />
             ))}
@@ -217,8 +217,8 @@ const CustomerDashboard = () => {
         ) : filteredHomeMeals.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filteredHomeMeals.map((meal) => (
-              <article key={meal.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="h-36 w-full bg-gray-100">
+              <article key={meal.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="h-32 w-full bg-gray-100">
                   {meal.image_path ? (
                     <img src={resolveMediaUrl(meal.image_path)} alt={meal.name} className="h-full w-full object-cover" />
                   ) : (
@@ -228,15 +228,15 @@ const CustomerDashboard = () => {
                   )}
                 </div>
 
-                <div className="p-4">
+                <div className="p-3.5">
                   <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">{meal.category_name || 'Meal'}</p>
                   <h3 className="mt-1 text-base font-semibold text-gray-900 line-clamp-1">{meal.name}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-gray-600">{meal.description}</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <p className="text-lg font-bold text-gray-900">MK {Number(meal.price).toFixed(2)}</p>
+                    <p className="text-base font-bold text-gray-900">MK {Number(meal.price).toFixed(2)}</p>
                     <button
                       onClick={() => addToCart(meal, 1)}
-                      className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                      className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
                     >
                       Add
                     </button>
@@ -252,7 +252,7 @@ const CustomerDashboard = () => {
         )}
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+      <section className="rounded-xl border border-gray-200 bg-white p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Order Tracking</h2>
           <button onClick={loadOrders} className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
@@ -305,16 +305,16 @@ const CustomerDashboard = () => {
         <>
           <div className="space-y-3">
             {cartItems.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <article key={item.id} className="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="h-16 w-16 overflow-hidden rounded-lg bg-gray-100">
+                  <div className="h-14 w-14 overflow-hidden rounded-lg bg-gray-100">
                     {item.image_path ? (
                       <img src={resolveMediaUrl(item.image_path)} alt={item.name} className="h-full w-full object-cover" />
                     ) : null}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{item.name}</p>
+                    <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
                     <p className="text-sm text-gray-600">MK {Number(item.price).toFixed(2)} each</p>
                     <p className="text-sm font-semibold text-gray-900">MK {(Number(item.price) * item.quantity).toFixed(2)}</p>
                   </div>
@@ -348,7 +348,7 @@ const CustomerDashboard = () => {
             </div>
             <button
               onClick={() => navigate('/customer/checkout')}
-              className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+              className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
             >
               Proceed to Checkout
             </button>
@@ -387,7 +387,7 @@ const CustomerDashboard = () => {
                   const status = STATUS_META[order.status] || STATUS_META.pending;
                   const Icon = status.icon;
                   return (
-                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <div>
                           <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
@@ -395,7 +395,7 @@ const CustomerDashboard = () => {
                           <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
                         </div>
                         <div className="text-left md:text-right">
-                          <p className="text-lg font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
+                          <p className="text-base font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
                           <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>
                             <Icon className="h-3.5 w-3.5" /> {status.label}
                           </span>
@@ -420,7 +420,7 @@ const CustomerDashboard = () => {
                   const status = STATUS_META[order.status] || STATUS_META.pending;
                   const Icon = status.icon;
                   return (
-                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                    <article key={order.id} className="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <div>
                           <p className="font-semibold text-gray-900">Order #{order.order_number}</p>
@@ -428,7 +428,7 @@ const CustomerDashboard = () => {
                           <p className="mt-1 text-sm text-gray-600">{order.delivery_address}</p>
                         </div>
                         <div className="text-left md:text-right">
-                          <p className="text-lg font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
+                          <p className="text-base font-bold text-gray-900">MK {Number(order.total_amount).toFixed(2)}</p>
                           <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>
                             <Icon className="h-3.5 w-3.5" /> {status.label}
                           </span>
@@ -457,13 +457,13 @@ const CustomerDashboard = () => {
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
+    <div className="mx-auto w-full max-w-6xl">
       {error && <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
 
-      <div className="hidden items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 md:flex">
+      <div className="hidden items-center justify-between rounded-xl border border-gray-200 bg-white p-4 md:flex">
         <div>
           <p className="text-sm text-gray-500">Aunt Joy&apos;s Restaurant</p>
-          <p className="text-lg font-semibold text-gray-900">Mzuzu Delivery</p>
+          <p className="text-base font-semibold text-gray-900">Mzuzu Delivery</p>
         </div>
         <div className="flex items-center gap-3 text-sm text-gray-600">
           <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><MapPin className="h-4 w-4" /> Mzuzu</span>
@@ -483,7 +483,7 @@ const CustomerDashboard = () => {
       {section !== 'cart' && section !== 'checkout' && getTotalItems() > 0 && (
         <button
           onClick={() => navigate('/customer/cart')}
-          className="fixed bottom-20 right-4 z-40 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-emerald-700 md:bottom-6"
+          className="fixed bottom-20 right-4 z-40 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-emerald-700 md:bottom-6"
         >
           Cart • MK {getTotalPrice().toFixed(2)}
         </button>

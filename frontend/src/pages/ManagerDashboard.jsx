@@ -115,10 +115,10 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sales Reports & Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Sales Reports & Analytics</h1>
           <p className="text-gray-600">Welcome, {user?.name}. Analyze sales performance with live data.</p>
         </div>
 
@@ -126,7 +126,7 @@ const ManagerDashboard = () => {
           <select
             value={filters.month}
             onChange={(e) => setFilters((prev) => ({ ...prev, month: parseInt(e.target.value, 10) }))}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             {MONTHS.map((month) => (
               <option key={month.value} value={month.value}>
@@ -138,7 +138,7 @@ const ManagerDashboard = () => {
           <select
             value={filters.year}
             onChange={(e) => setFilters((prev) => ({ ...prev, year: parseInt(e.target.value, 10) }))}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -150,7 +150,7 @@ const ManagerDashboard = () => {
           <button
             onClick={loadReports}
             disabled={isLoading}
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Refresh
           </button>
@@ -158,7 +158,7 @@ const ManagerDashboard = () => {
           <button
             onClick={() => exportReport('pdf')}
             disabled={isExporting || isLoading}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors inline-flex items-center gap-1"
+            className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors inline-flex items-center gap-1"
           >
             <Download className="h-4 w-4" /> PDF
           </button>
@@ -166,81 +166,81 @@ const ManagerDashboard = () => {
           <button
             onClick={() => exportReport('excel')}
             disabled={isExporting || isLoading}
-            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors inline-flex items-center gap-1"
+            className="bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50 transition-colors inline-flex items-center gap-1"
           >
             <Download className="h-4 w-4" /> Excel
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">MK {Number(reports.total_revenue || 0).toFixed(2)}</p>
+              <p className="text-xl font-bold text-gray-900">MK {Number(reports.total_revenue || 0).toFixed(2)}</p>
               <p className="text-sm text-emerald-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.total_revenue, previousReports.total_revenue)} vs prev period
               </p>
             </div>
-            <div className="bg-emerald-100 p-3 rounded-lg">
-              <DollarSign className="h-6 w-6 text-emerald-600" />
+            <div className="bg-emerald-100 p-2.5 rounded-lg">
+              <DollarSign className="h-5 w-5 text-emerald-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{reports.total_orders || 0}</p>
+              <p className="text-xl font-bold text-gray-900">{reports.total_orders || 0}</p>
               <p className="text-sm text-blue-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.total_orders, previousReports.total_orders)} vs prev period
               </p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <Package className="h-6 w-6 text-blue-600" />
+            <div className="bg-blue-100 p-2.5 rounded-lg">
+              <Package className="h-5 w-5 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Active Customers</p>
-              <p className="text-2xl font-bold text-gray-900">{reports.active_customers || 0}</p>
+              <p className="text-xl font-bold text-gray-900">{reports.active_customers || 0}</p>
               <p className="text-sm text-violet-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.active_customers, previousReports.active_customers)} vs prev period
               </p>
             </div>
-            <div className="bg-violet-100 p-3 rounded-lg">
-              <Users className="h-6 w-6 text-violet-600" />
+            <div className="bg-violet-100 p-2.5 rounded-lg">
+              <Users className="h-5 w-5 text-violet-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Order Value</p>
-              <p className="text-2xl font-bold text-gray-900">MK {Number(reports.average_order_value || 0).toFixed(2)}</p>
+              <p className="text-xl font-bold text-gray-900">MK {Number(reports.average_order_value || 0).toFixed(2)}</p>
               <p className="text-sm text-amber-600 flex items-center mt-1">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 {pctChange(reports.average_order_value, previousReports.average_order_value)} vs prev period
               </p>
             </div>
-            <div className="bg-amber-100 p-3 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-amber-600" />
+            <div className="bg-amber-100 p-2.5 rounded-lg">
+              <BarChart3 className="h-5 w-5 text-amber-600" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Selling Items</h3>
 
           {isLoading ? (
@@ -268,7 +268,7 @@ const ManagerDashboard = () => {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Sales</h3>
 
           {isLoading ? (

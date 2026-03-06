@@ -54,20 +54,20 @@ const Cart = () => {
       {/* Overlay */}
       {isCartOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/20 backdrop-blur-[1px] z-40 transition-opacity"
+          className="fixed inset-0 bg-slate-900/10 z-40 transition-opacity"
           onClick={closeCart}
         />
       )}
 
       {/* Cart Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white shadow-lg z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
         isCartOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-3.5 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <ShoppingCart className="h-6 w-6 text-primary-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Your Cart</h2>
+            <ShoppingCart className="h-5 w-5 text-primary-600" />
+            <h2 className="text-base font-semibold text-gray-900">Your Cart</h2>
             {cartItems.length > 0 && (
               <span className="bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {cartItems.length}
@@ -85,7 +85,7 @@ const Cart = () => {
         {/* Cart Content */}
         <div className="flex flex-col flex-1 min-h-0">
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-4 pb-6">
+          <div className="flex-1 overflow-y-auto p-3.5 pb-5">
             {cartItems.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -93,9 +93,9 @@ const Cart = () => {
                 <p className="text-gray-600">Add some delicious meals to get started!</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center space-x-4 bg-gray-50 rounded-lg p-4">
+                  <div key={item.id} className="flex items-center space-x-3 bg-gray-50 rounded-lg p-3">
                     {/* Item Image */}
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                       {item.image_path ? (
@@ -113,8 +113,8 @@ const Cart = () => {
 
                     {/* Item Details */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
-                      <p className="text-primary-600 font-semibold">
+                      <h4 className="text-sm font-semibold text-gray-900 truncate">{item.name}</h4>
+                      <p className="text-primary-600 text-sm font-semibold">
                         {formatCurrency(item.price * item.quantity)}
                       </p>
                       
@@ -127,7 +127,7 @@ const Cart = () => {
                           >
                             <Minus className="h-3 w-3" />
                           </button>
-                          <span className="font-medium w-8 text-center">{item.quantity}</span>
+                          <span className="font-medium text-sm w-8 text-center">{item.quantity}</span>
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                             className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
@@ -152,9 +152,9 @@ const Cart = () => {
 
           {/* Cart Footer */}
           {cartItems.length > 0 && (
-            <div className="border-t border-gray-200 p-4 pb-6 space-y-4 bg-white">
+            <div className="border-t border-gray-200 p-3.5 pb-5 space-y-3 bg-white">
               {/* Total */}
-              <div className="flex justify-between items-center text-lg font-semibold">
+              <div className="flex justify-between items-center text-base font-semibold">
                 <span>Total:</span>
                 <span className="text-primary-600">{formatCurrency(getTotalPrice())}</span>
               </div>
@@ -167,14 +167,14 @@ const Cart = () => {
                     closeCart();
                     navigate('/customer/checkout');
                   }}
-                  className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                  className="w-full bg-primary-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-primary-700 transition-colors"
                 >
                   Proceed to Checkout
                 </button>
                 
                 <button
                   onClick={handleClearCart}
-                  className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm"
+                  className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors text-xs"
                 >
                   Clear Cart
                 </button>

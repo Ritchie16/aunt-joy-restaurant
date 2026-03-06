@@ -140,9 +140,9 @@ const SalesDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Order Management
@@ -152,12 +152,12 @@ const SalesDashboard = () => {
           </p>
         </div>
         
-        <div className="flex items-center space-x-4 mt-4 md:mt-0">
+        <div className="flex items-center space-x-3 mt-4 md:mt-0">
           {/* Refresh Button */}
           <button
             onClick={() => loadOrders()}
             disabled={isRefreshing}
-            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center space-x-2"
+            className="bg-white border border-gray-300 text-gray-700 px-3.5 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center space-x-2 text-sm font-semibold"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
@@ -167,7 +167,7 @@ const SalesDashboard = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="all">All Orders</option>
             <option value="pending">Pending</option>
@@ -180,21 +180,21 @@ const SalesDashboard = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {['pending', 'preparing', 'out_for_delivery', 'delivered'].map(status => {
           const statusInfo = getStatusInfo(status);
           const Icon = statusInfo.icon;
           const count = orders.filter(order => order.status === status).length;
 
           return (
-            <div key={status} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={status} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{statusInfo.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{count}</p>
+                  <p className="text-xl font-bold text-gray-900">{count}</p>
                 </div>
-                <div className={`p-3 rounded-lg ${statusInfo.color.split(' ')[0]}`}>
-                  <Icon className="h-6 w-6" />
+                <div className={`p-2.5 rounded-lg ${statusInfo.color.split(' ')[0]}`}>
+                  <Icon className="h-5 w-5" />
                 </div>
               </div>
             </div>
@@ -203,9 +203,9 @@ const SalesDashboard = () => {
       </div>
 
       {/* Orders List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-4">
+        <div className="border-b border-gray-200 px-5 py-3.5">
           <h2 className="text-lg font-semibold text-gray-900">
             Orders ({filteredOrders.length})
           </h2>
@@ -228,7 +228,7 @@ const SalesDashboard = () => {
               const nextStatus = getNextStatus(order.status);
 
               return (
-                <div key={order.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div key={order.id} className="p-5 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                     {/* Order Info */}
                     <div className="flex-1">
@@ -238,13 +238,13 @@ const SalesDashboard = () => {
                           {statusInfo.label}
                         </span>
                         <span className="text-sm text-gray-500">#{order.order_number}</span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs text-gray-500">
                           {new Date(order.created_at).toLocaleDateString()} at{' '}
                           {new Date(order.created_at).toLocaleTimeString()}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                         <div>
                           <p className="font-medium text-gray-900">{order.customer_name}</p>
                           <p className="text-gray-600">{order.customer_phone}</p>
@@ -272,7 +272,7 @@ const SalesDashboard = () => {
                       {nextStatus && (
                         <button
                           onClick={() => updateOrderStatus(order.id, nextStatus)}
-                          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+                          className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-semibold"
                         >
                           Mark as {getStatusInfo(nextStatus).label}
                         </button>
