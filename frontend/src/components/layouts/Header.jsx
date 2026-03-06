@@ -29,8 +29,8 @@ const Header = () => {
     Logger.info(`User logout: ${user?.email}`);
     logout();
     setIsProfileMenuOpen(false);
-    // Use hard redirect to avoid route-guard race conditions after auth state reset.
-    window.location.replace('/');
+    setIsMobileMenuOpen(false);
+    navigate('/', { replace: true });
   };
 
   /**
