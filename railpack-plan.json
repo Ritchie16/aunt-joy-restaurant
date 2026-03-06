@@ -1,8 +1,6 @@
 {
   "name": "aunt-joy-restaurant",
-  "runtime": {
-    "node": "20.x"
-  },
-  "build": "cd frontend && npm install && npm run build",
-  "start": "cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT"
+  "runtime": { "node": "20.x" },
+  "build": "npm install && npm run build",
+  "start": "npm run preview -- --host 0.0.0.0 --port $PORT"
 }
