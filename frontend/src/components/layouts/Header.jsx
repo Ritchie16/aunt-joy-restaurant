@@ -75,6 +75,19 @@ const Header = () => {
     return roleMap[user?.role] || 'User';
   };
 
+  /**
+   * Get role dashboard label
+   */
+  const getRoleDashboardLabel = () => {
+    const roleMap = {
+      admin: 'Admin Dashboard',
+      manager: 'Manager Dashboard',
+      sales: 'Sales Dashboard',
+      customer: 'Home'
+    };
+    return roleMap[user?.role] || 'Home';
+  };
+
   return (
     <header className="bg-white/95 backdrop-blur sticky top-0 z-50 border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,7 +111,7 @@ const Header = () => {
                   to={getDashboardRoute()}
                   className="text-gray-700 hover:text-primary-600 text-sm font-semibold transition-colors"
                 >
-                  {isCustomer ? 'Home' : 'Dashboard'}
+                  {getRoleDashboardLabel()}
                 </Link>
                 
                 {isCustomer && (
@@ -212,7 +225,7 @@ const Header = () => {
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {isCustomer ? 'Home' : 'Dashboard'}
+                    {getRoleDashboardLabel()}
                   </Link>
                   
                   {isCustomer && (
