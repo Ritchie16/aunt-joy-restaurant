@@ -17,7 +17,7 @@ import { Logger } from '../../utils/helpers';
  */
 const Header = () => {
   const { user, logout, isCustomer } = useAuth();
-  const { getTotalItems, openCart } = useCart();
+  const { getTotalItems } = useCart();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -114,7 +114,7 @@ const Header = () => {
                     to="/customer/orders"
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                   >
-                    Orders
+                    My Orders
                   </Link>
                 )}
               </>
@@ -126,7 +126,7 @@ const Header = () => {
             {/* Shopping Cart (for customers) */}
             {isCustomer && (
               <button
-                onClick={openCart}
+                onClick={() => navigate('/customer/cart')}
                 className="relative p-2 text-gray-700 hover:text-primary-600 transition-colors"
                 aria-label="Shopping cart"
               >

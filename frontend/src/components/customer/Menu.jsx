@@ -111,8 +111,8 @@ const Menu = () => {
   /**
    * Handle add to cart
    */
-  const handleAddToCart = (meal) => {
-    addToCart(meal);
+  const handleAddToCart = (meal, quantity = 1) => {
+    addToCart(meal, quantity);
   };
 
   if (error) {

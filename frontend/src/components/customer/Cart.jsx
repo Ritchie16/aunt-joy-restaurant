@@ -54,13 +54,13 @@ const Cart = () => {
       {/* Overlay */}
       {isCartOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-[1px] z-40 transition-opacity"
           onClick={closeCart}
         />
       )}
 
       {/* Cart Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
         isCartOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         {/* Header */}
@@ -83,9 +83,9 @@ const Cart = () => {
         </div>
 
         {/* Cart Content */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 pb-6">
             {cartItems.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -152,7 +152,7 @@ const Cart = () => {
 
           {/* Cart Footer */}
           {cartItems.length > 0 && (
-            <div className="border-t border-gray-200 p-4 space-y-4">
+            <div className="border-t border-gray-200 p-4 pb-6 space-y-4 bg-white">
               {/* Total */}
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total:</span>
