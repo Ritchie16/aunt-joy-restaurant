@@ -5,6 +5,7 @@ import {
   Users, 
   Utensils, 
   Package, 
+  ShoppingCart,
   FileText,
   LogOut 
 } from 'lucide-react';
@@ -19,14 +20,23 @@ const Sidebar = () => {
 
   // Navigation items based on user role
   const getNavigationItems = () => {
-    const baseItems = [
-      {
-        name: 'Dashboard',
-        href: '/dashboard',
-        icon: BarChart3,
-        roles: ['admin', 'manager', 'sales', 'customer']
-      }
-    ];
+    const baseItems = user?.role === 'customer'
+      ? [
+          {
+            name: 'Home',
+            href: '/customer',
+            icon: BarChart3,
+            roles: ['customer']
+          }
+        ]
+      : [
+          {
+            name: 'Dashboard',
+            href: '/dashboard',
+            icon: BarChart3,
+            roles: ['admin', 'manager', 'sales']
+          }
+        ];
 
     const roleSpecificItems = {
       admin: [
@@ -70,6 +80,12 @@ const Sidebar = () => {
           name: 'My Orders',
           href: '/customer/orders',
           icon: Package,
+          roles: ['customer']
+        },
+        {
+          name: 'Cart',
+          href: '/customer/cart',
+          icon: ShoppingCart,
           roles: ['customer']
         }
       ]

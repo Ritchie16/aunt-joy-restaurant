@@ -97,7 +97,7 @@ const Header = () => {
                   to={getDashboardRoute()}
                   className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
-                  Dashboard
+                  {isCustomer ? 'Home' : 'Dashboard'}
                 </Link>
                 
                 {isCustomer && (
@@ -106,6 +106,15 @@ const Header = () => {
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                   >
                     Menu
+                  </Link>
+                )}
+
+                {isCustomer && (
+                  <Link
+                    to="/customer/orders"
+                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                  >
+                    Orders
                   </Link>
                 )}
               </>
@@ -201,7 +210,7 @@ const Header = () => {
                     className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Dashboard
+                    {isCustomer ? 'Home' : 'Dashboard'}
                   </Link>
                   
                   {isCustomer && (

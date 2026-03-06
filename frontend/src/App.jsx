@@ -118,6 +118,7 @@ function App() {
                     <Routes>
                       <Route index element={<CustomerDashboard />} />
                       <Route path="menu" element={<CustomerDashboard />} />
+                      <Route path="cart" element={<CustomerDashboard />} />
                       <Route path="orders" element={<CustomerDashboard />} />
                       <Route path="checkout" element={<CustomerDashboard />} />
                     </Routes>
