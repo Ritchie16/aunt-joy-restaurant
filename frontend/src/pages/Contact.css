@@ -1,0 +1,16 @@
+/* src/pages/Contact.css */
+
+/* Nothing fancy yet; the page mostly relies on Tailwind classes. */
+
+/* small spacing adjustments if needed */
+
+form input,
+form textarea {
+  transition: border-color 0.2s ease;
+}
+
+form input:focus,
+form textarea:focus {
+  border-color: #059669;
+  outline: none;
+}

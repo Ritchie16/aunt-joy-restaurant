@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock3, MapPin, Phone } from 'lucide-react';
+import { ArrowRight, Clock3, MapPin, Phone, Utensils } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/useAuth';
 import { resolveMediaUrl } from '../utils/media';
+
+// landing-specific styling & components
+import './LandingPage.css';
+import Footer from '../components/landing/Footer';
 
 const LandingPage = () => {
   const { isAuthenticated, user } = useAuth();
@@ -30,12 +34,17 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div>
-            <p className="text-sm text-slate-500">Aunt Joy&apos;s Restaurant</p>
-            <h1 className="text-lg font-bold text-slate-900">Online Ordering</h1>
+          <div className="flex items-center space-x-3">
+            <div className="bg-primary-500 p-2 rounded-lg">
+              <Utensils className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Aunt Joy&apos;s Restaurant</p>
+              <h1 className="text-lg font-bold text-slate-900">Online Ordering</h1>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -70,8 +79,8 @@ const LandingPage = () => {
 
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1"><MapPin className="h-4 w-4" /> Mzuzu</span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1"><Clock3 className="h-4 w-4" /> 7:00 AM - 10:00 PM</span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1"><Phone className="h-4 w-4" /> +265 123 456 789</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1"><Clock3 className="h-4 w-4" /> 8:00 AM - 10:00 PM</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1"><Phone className="h-4 w-4" /> +265 (0) 999 467 324</span>
           </div>
 
           <div className="mt-6">
@@ -133,6 +142,8 @@ const LandingPage = () => {
           )}
         </section>
       </main>
+      {/* landing footer */}
+      <Footer />
     </div>
   );
 };

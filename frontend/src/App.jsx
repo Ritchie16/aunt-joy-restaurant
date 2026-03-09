@@ -5,6 +5,7 @@ import { useAuth } from './contexts/useAuth';
 import { CartProvider } from './contexts/CartContext';
 import Layout from './components/layouts/Layout';
 import LandingPage from './pages/LandingPage';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerDashboard from './pages/CustomerDashboard';
@@ -90,6 +91,12 @@ function App() {
                 </PublicRoute>
               } />
               
+              <Route path="/contact" element={
+                <PublicRoute>
+                  <Contact />
+                </PublicRoute>
+              } />
+
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
