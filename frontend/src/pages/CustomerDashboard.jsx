@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -20,6 +21,17 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/useAuth';
+=======
+//temporary user
+const fakeUser = {
+  id: 1,
+  name: "Ruby",
+  email: "ruby@gmail.com"
+};
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+//import { useAuth } from '../contexts/useAuth';
+>>>>>>> Stashed changes
 import { useCart } from '../contexts/CartContext';
 import Menu from '../components/customer/Menu';
 import Checkout from '../components/customer/Checkout';
@@ -36,6 +48,7 @@ const STATUS_META = {
 };
 
 const CustomerDashboard = () => {
+<<<<<<< Updated upstream
   const { user } = useAuth();
   const {
     cartItems,
@@ -54,6 +67,12 @@ const CustomerDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+=======
+  //const { user } = useAuth();
+  const user = fakeUser;
+  const { getTotalItems, getTotalPrice } = useCart();
+  const [recentOrders, setRecentOrders] = useState([]);
+>>>>>>> Stashed changes
   const [isLoading, setIsLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [error, setError] = useState('');
