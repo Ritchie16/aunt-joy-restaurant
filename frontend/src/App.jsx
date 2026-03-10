@@ -1,3 +1,4 @@
+import Checkout from "./pages/Checkout";
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -124,10 +125,7 @@ function App() {
                   <Layout>
                     <Routes>
                       <Route index element={<CustomerDashboard />} />
-                      <Route path="menu" element={<CustomerDashboard />} />
-                      <Route path="cart" element={<CustomerDashboard />} />
-                      <Route path="orders" element={<CustomerDashboard />} />
-                      <Route path="checkout" element={<CustomerDashboard />} />
+                      <Route path="checkout" element={<Checkout />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>

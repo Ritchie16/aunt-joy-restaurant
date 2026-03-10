@@ -12,6 +12,7 @@ class Meal
     private $conn;
     private $table = 'meals';
     private $logger;
+    private $hasAuditColumns = false; // flag to indicate presence of created_by/updated_by
 
     public function __construct()
     {
@@ -20,6 +21,14 @@ class Meal
             $this->conn = $database->getConnection();
             $this->logger = new Logger();
             $this->logger->debug("Meal model initialized");
+
+            // determine whether audit columns exist so queries can adapt
+            $this->hasAuditColumns = $this->checkAuditColumns();
+            if ($this->hasAuditColumns) {
+                $this->logger->debug("Audit columns detected on meals table");
+            } else {
+                $this->logger->warning("Audit columns missing on meals table, using simplified queries");
+            }
         } catch (Exception $e) {
             $this->logger = new Logger();
             $this->logger->error("Failed to initialize Meal model: " . $e->getMessage());
@@ -27,29 +36,56 @@ class Meal
         }
     }
 
+    /**
+     * Check for the existence of audit columns in the meals table
+     *
+     * @return bool
+     */
+    private function checkAuditColumns()
+    {
+        try {
+            $stmt = $this->conn->prepare("SHOW COLUMNS FROM {$this->table} LIKE 'created_by'");
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            $this->logger->error("Error checking audit columns: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
     /**
-     * Get all meals with categories and creator/updater info
+     * Get all meals with categories (and optionally creator/updater info)
      */
     public function getAllWithDetails()
     {
         try {
             $this->logger->info("Getting all meals with details");
 
-            $query = "
-                SELECT 
-                    m.*, 
-                    c.name as category_name,
-                    creator.name as creator_name,
-                    creator.email as creator_email,
-                    updater.name as updater_name,
-                    updater.email as updater_email
-                FROM {$this->table} m 
-                LEFT JOIN categories c ON m.category_id = c.id 
-                LEFT JOIN users creator ON m.created_by = creator.id
-                LEFT JOIN users updater ON m.updated_by = updater.id
-                ORDER BY m.created_at DESC
-            ";
+            if ($this->hasAuditColumns) {
+                $query = "
+                    SELECT 
+                        m.*, 
+                        c.name as category_name,
+                        creator.name as creator_name,
+                        creator.email as creator_email,
+                        updater.name as updater_name,
+                        updater.email as updater_email
+                    FROM {$this->table} m 
+                    LEFT JOIN categories c ON m.category_id = c.id 
+                    LEFT JOIN users creator ON m.created_by = creator.id
+                    LEFT JOIN users updater ON m.updated_by = updater.id
+                    ORDER BY m.created_at DESC
+                ";
+            } else {
+                // fallback to simple query when audit columns are not available
+                $query = "
+                    SELECT m.*, c.name as category_name
+                    FROM {$this->table} m
+                    LEFT JOIN categories c ON m.category_id = c.id
+                    ORDER BY m.created_at DESC
+                ";
+            }
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
@@ -66,24 +102,34 @@ class Meal
     }
 
     /**
-     * Get available meals with creator info
+     * Get available meals with creator info (if audit columns exist)
      */
     public function getAvailableWithDetails()
     {
         try {
             $this->logger->info("Getting available meals with details");
 
-            $query = "
-                SELECT 
-                    m.*, 
-                    c.name as category_name,
-                    creator.name as creator_name
-                FROM {$this->table} m 
-                LEFT JOIN categories c ON m.category_id = c.id 
-                LEFT JOIN users creator ON m.created_by = creator.id
-                WHERE m.is_available = 1 
-                ORDER BY m.name
-            ";
+            if ($this->hasAuditColumns) {
+                $query = "
+                    SELECT 
+                        m.*, 
+                        c.name as category_name,
+                        creator.name as creator_name
+                    FROM {$this->table} m 
+                    LEFT JOIN categories c ON m.category_id = c.id 
+                    LEFT JOIN users creator ON m.created_by = creator.id
+                    WHERE m.is_available = 1 
+                    ORDER BY m.name
+                ";
+            } else {
+                $query = "
+                    SELECT m.*, c.name as category_name 
+                    FROM {$this->table} m 
+                    LEFT JOIN categories c ON m.category_id = c.id 
+                    WHERE m.is_available = 1 
+                    ORDER BY m.name
+                ";
+            }
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
@@ -132,27 +178,36 @@ class Meal
 
 
     /**
-     * Get meal by ID with creator/updater details
+     * Get meal by ID with creator/updater details (when available)
      */
     public function findByIdWithDetails($id)
     {
         try {
             $this->logger->info("Finding meal by ID with details: {$id}");
 
-            $query = "
-                SELECT 
-                    m.*, 
-                    c.name as category_name,
-                    creator.name as creator_name,
-                    creator.email as creator_email,
-                    updater.name as updater_name,
-                    updater.email as updater_email
-                FROM {$this->table} m 
-                LEFT JOIN categories c ON m.category_id = c.id 
-                LEFT JOIN users creator ON m.created_by = creator.id
-                LEFT JOIN users updater ON m.updated_by = updater.id
-                WHERE m.id = :id
-            ";
+            if ($this->hasAuditColumns) {
+                $query = "
+                    SELECT 
+                        m.*, 
+                        c.name as category_name,
+                        creator.name as creator_name,
+                        creator.email as creator_email,
+                        updater.name as updater_name,
+                        updater.email as updater_email
+                    FROM {$this->table} m 
+                    LEFT JOIN categories c ON m.category_id = c.id 
+                    LEFT JOIN users creator ON m.created_by = creator.id
+                    LEFT JOIN users updater ON m.updated_by = updater.id
+                    WHERE m.id = :id
+                ";
+            } else {
+                $query = "
+                    SELECT m.*, c.name as category_name
+                    FROM {$this->table} m
+                    LEFT JOIN categories c ON m.category_id = c.id
+                    WHERE m.id = :id
+                ";
+            }
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
@@ -215,15 +270,26 @@ class Meal
         try {
             $this->logger->info("Creating new meal: " . ($data['name'] ?? 'Unknown'));
 
-            $query = "
-                INSERT INTO {$this->table} 
-                (name, description, price, image_path, category_id, is_available, created_by, updated_by) 
-                VALUES (:name, :description, :price, :image_path, :category_id, :is_available, :created_by, :updated_by)
-            ";
+            $creatorId = $userId ?? 1; // default admin if not provided
+
+            if ($this->hasAuditColumns) {
+                $query = "
+                    INSERT INTO {$this->table} 
+                    (name, description, price, image_path, category_id, is_available, created_by, updated_by) 
+                    VALUES (:name, :description, :price, :image_path, :category_id, :is_available, :created_by, :updated_by)
+                ";
+            } else {
+                // fallback to minimal insert
+                $query = "
+                    INSERT INTO {$this->table} 
+                    (name, description, price, image_path, category_id, is_available) 
+                    VALUES (:name, :description, :price, :image_path, :category_id, :is_available)
+                ";
+            }
 
             $stmt = $this->conn->prepare($query);
 
-            // Get values to bind
+            // Common values
             $name = $data['name'];
             $description = $data['description'] ?? '';
             $price = floatval($data['price']);
@@ -231,18 +297,17 @@ class Meal
             $category_id = intval($data['category_id']);
             $is_available = isset($data['is_available']) ? intval($data['is_available']) : 1;
 
-            // Use userId if provided, otherwise use default admin (for backward compatibility)
-            $creatorId = $userId ?? 1;
-
-            // Bind parameters - use bindValue instead of bindParam for direct values
             $stmt->bindValue(':name', $name);
             $stmt->bindValue(':description', $description);
             $stmt->bindValue(':price', $price);
             $stmt->bindValue(':image_path', $image_path);
             $stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
             $stmt->bindValue(':is_available', $is_available, PDO::PARAM_INT);
-            $stmt->bindValue(':created_by', $creatorId, PDO::PARAM_INT);
-            $stmt->bindValue(':updated_by', $creatorId, PDO::PARAM_INT);
+
+            if ($this->hasAuditColumns) {
+                $stmt->bindValue(':created_by', $creatorId, PDO::PARAM_INT);
+                $stmt->bindValue(':updated_by', $creatorId, PDO::PARAM_INT);
+            }
 
             $stmt->execute();
 
@@ -266,11 +331,16 @@ class Meal
             $this->logger->info("Updating meal ID: {$id} by user: {$userId}");
 
             // Build dynamic update query
-            $fields = ["updated_by = :updated_by"]; // Always update the updated_by field
+            $fields = [];
             $params = [
-                ':id' => $id,
-                ':updated_by' => $userId ?? 1 // Use userId if provided, otherwise use default admin
+                ':id' => $id
             ];
+
+            // update audit column if available
+            if ($this->hasAuditColumns) {
+                $fields[] = "updated_by = :updated_by";
+                $params[':updated_by'] = $userId ?? 1;
+            }
 
             if (isset($data['name'])) {
                 $fields[] = "name = :name";
@@ -297,7 +367,7 @@ class Meal
                 $params[':is_available'] = intval($data['is_available']);
             }
 
-            if (count($fields) <= 1) { // Only updated_by field
+            if (empty($fields)) {
                 $this->logger->warning("No fields to update for meal ID: {$id}");
                 return false;
             }
@@ -322,7 +392,7 @@ class Meal
             $success = $stmt->execute();
 
             if ($success && $stmt->rowCount() > 0) {
-                $this->logger->info("Meal updated successfully: ID {$id} by user {$params[':updated_by']}");
+                $this->logger->info("Meal updated successfully: ID {$id} by user " . ($params[':updated_by'] ?? 'n/a'));
                 return true;
             } else {
                 $this->logger->warning("No rows affected when updating meal ID: {$id}");
