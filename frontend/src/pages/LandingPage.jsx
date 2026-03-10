@@ -160,7 +160,7 @@ const LandingPage = () => {
         </section>
       </main>
       {/* about us section pulled from component */}
-      {/*<AboutSection /> */}
+      <AboutSection /> 
       {/* landing footer */}
       {/* clear filter button if active */}
       {selectedCategory !== 'all' && (
