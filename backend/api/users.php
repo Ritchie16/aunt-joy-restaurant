@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load environment FIRST
 require_once __DIR__ . '/../config/Environment.php';
 
-// Fix paths
+// Fix paths - use absolute paths
 require_once __DIR__ . '/../controllers/UserController.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/Logger.php';
@@ -34,8 +34,11 @@ try {
 
     $logger->info("Users API Request: {$method} {$path}");
 
-    // Extract endpoint
-    $endpoint = ltrim(substr($path, strlen('/api/')), '/');
+    // Extract endpoint - handle both /api/users and /api/users/role/xxx
+    $basePath = '/api/';
+    $endpoint = substr($path, strlen($basePath));
+    
+    $logger->debug("Processing endpoint: {$endpoint}");
 
     switch ($method) {
         case 'GET':

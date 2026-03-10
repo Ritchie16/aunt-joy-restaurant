@@ -184,4 +184,46 @@ class Validation
 
         return $errors;
     }
+
+    /**
+     * =============================================
+     * FORGOT PASSWORD & RESET PASSWORD VALIDATION
+     * =============================================
+     */
+
+    /**
+     * Validate email for password reset
+     */
+    public function validateEmail($email)
+    {
+        $errors = [];
+        
+        if (empty($email)) {
+            $errors['email'] = 'Email is required';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Valid email is required';
+        }
+        
+        return $errors;
+    }
+
+    /**
+     * Validate password reset data
+     */
+    public function validatePasswordReset($data)
+    {
+        $errors = [];
+        
+        if (empty($data['token'])) {
+            $errors['token'] = 'Reset token is required';
+        }
+        
+        if (empty($data['password'])) {
+            $errors['password'] = 'New password is required';
+        } elseif (strlen($data['password']) < 6) {
+            $errors['password'] = 'Password must be at least 6 characters';
+        }
+        
+        return $errors;
+    }
 }

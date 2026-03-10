@@ -53,32 +53,55 @@ try {
         exit();
     }
 
-    // Simple routing
-    if (strpos($path, '/api/auth/') === 0) {
+    // Simple routing - FIXED ORDER: More specific routes first
+    
+    // 1. Forgot Password route (specific)
+    if (strpos($path, '/api/forgot-password') === 0) {
+        $logger->debug("Routing to forgot-password.php");
+        require_once $baseDir . '/api/forgot-password.php';
+    }
+    // 2. Auth routes
+    elseif (strpos($path, '/api/auth/') === 0) {
         $logger->debug("Routing to auth.php");
         require_once $baseDir . '/api/auth.php';
-    } elseif (strpos($path, '/api/users') === 0) {
+    }
+    // 3. Users routes
+    elseif (strpos($path, '/api/users') === 0) {
         $logger->debug("Routing to users.php");
         require_once $baseDir . '/api/users.php';
-    } elseif (strpos($path, '/api/meals') === 0) {
+    }
+    // 4. Meals routes
+    elseif (strpos($path, '/api/meals') === 0) {
         $logger->debug("Routing to meals.php");
         require_once $baseDir . '/api/meals.php';
-    } elseif (strpos($path, '/api/categories') === 0) {
+    }
+    // 5. Categories routes
+    elseif (strpos($path, '/api/categories') === 0) {
         $logger->debug("Routing to categories.php");
         require_once $baseDir . '/api/categories.php';
-    } elseif (strpos($path, '/api/orders') === 0) {
+    }
+    // 6. Orders routes
+    elseif (strpos($path, '/api/orders') === 0) {
         $logger->debug("Routing to orders.php");
         require_once $baseDir . '/api/orders.php';
-    } elseif (strpos($path, '/api/reports') === 0) {
+    }
+    // 7. Reports routes
+    elseif (strpos($path, '/api/reports') === 0) {
         $logger->debug("Routing to reports.php");
         require_once $baseDir . '/api/reports.php';
-    } elseif ($path === '/api/debug') {
+    }
+    // 8. Debug routes
+    elseif ($path === '/api/debug') {
         $logger->debug("Routing to debug.php");
         require_once $baseDir . '/api/debug.php';
-    } elseif ($path === '/api/test') {
+    }
+    // 9. Test routes
+    elseif ($path === '/api/test') {
         $logger->debug("Routing to test endpoint");
         require_once $baseDir . '/api/test.php';
-    } else {
+    }
+    // 10. Not found
+    else {
         $logger->warning("Endpoint not found: {$path}");
         Response::error('Endpoint not found: ' . $path, [], 404);
     }

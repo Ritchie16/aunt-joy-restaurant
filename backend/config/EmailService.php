@@ -42,13 +42,7 @@ class EmailService
 
             // Server settings
             $this->mailer->isSMTP();
-
-            // Enable verbose debugging
-            $this->mailer->SMTPDebug = SMTP::DEBUG_CONNECTION; // Full debug output
-            $this->mailer->Debugoutput = function ($str, $level) {
-                $this->logger->debug("SMTP [{$level}]: {$str}");
-            };
-
+            $this->mailer->SMTPDebug = SMTP::DEBUG_OFF; // Turn off debug in production
             $this->mailer->Host = $smtpHost;
             $this->mailer->SMTPAuth = true;
             $this->mailer->Username = $smtpUser;
@@ -80,55 +74,92 @@ class EmailService
             $this->mailer->isHTML(true);
 
             $this->isConfigured = true;
-            $this->logger->info("Email service configured successfully with Gmail");
+            $this->logger->info("Email service configured successfully");
         } catch (Exception $e) {
             $this->logger->error("Email setup failed: " . $e->getMessage());
             $this->isConfigured = false;
         }
     }
 
+    /**
+     * Send credentials email (for backward compatibility)
+     */
     public function sendCredentials($toEmail, $toName, $password, $role)
+    {
+        return $this->sendWelcomeEmail($toEmail, $toName, $password, $role);
+    }
+
+    /**
+     * Send welcome email with credentials (for admin-created users)
+     */
+    public function sendWelcomeEmail($toEmail, $toName, $password, $role)
     {
         try {
             if (!$this->isConfigured) {
-                $this->logger->info("Email service not configured. Would send credentials to: {$toEmail} with password: {$password}");
+                $this->logger->info("Email service not configured. Welcome email for {$toEmail} with password: {$password}");
                 return true;
             }
 
-            $this->logger->debug("Attempting to send email to: {$toEmail}");
+            $appUrl = Environment::get('APP_URL') ?: 'http://localhost:5173';
+            $loginUrl = "{$appUrl}/login";
 
             $this->mailer->clearAddresses();
             $this->mailer->addAddress($toEmail, $toName);
-            $this->mailer->Subject = 'Your Aunt Joy Restaurant Account Credentials';
-            $this->mailer->Body = $this->getCredentialsTemplate($toName, $toEmail, $password, $role);
+            $this->mailer->Subject = 'Welcome to Aunt Joy Restaurant - Your Account Details';
+            $this->mailer->Body = $this->getWelcomeEmailTemplate($toName, $toEmail, $password, $role, $loginUrl);
             $this->mailer->AltBody = strip_tags($this->mailer->Body);
 
-            // Test connection first
-            if (!$this->mailer->smtpConnect()) {
-                $this->logger->error("SMTP connection failed for: {$toEmail}");
-                return false;
-            }
-
-            $this->mailer->smtpClose();
-
-            // Now send the email
             if ($this->mailer->send()) {
-                $this->logger->info("✅ Email sent successfully to: {$toEmail}");
+                $this->logger->info("✅ Welcome email sent to: {$toEmail}");
                 return true;
             } else {
-                $this->logger->error("❌ Email sending failed for: {$toEmail}");
+                $this->logger->error("❌ Failed to send welcome email to: {$toEmail}");
                 return false;
             }
         } catch (Exception $e) {
-            $this->logger->error("Exception sending email to {$toEmail}: " . $e->getMessage());
+            $this->logger->error("Exception sending welcome email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
 
-    private function getCredentialsTemplate($name, $email, $password, $role)
+    /**
+     * Send password reset email
+     */
+    public function sendPasswordResetEmail($toEmail, $toName, $resetToken)
     {
-        $appUrl = Environment::get('APP_URL') ?: 'http://localhost:5173';
+        try {
+            $appUrl = Environment::get('APP_URL') ?: 'http://localhost:5173';
+            $resetLink = "{$appUrl}/reset-password?token={$resetToken}";
+            
+            if (!$this->isConfigured) {
+                $this->logger->info("Email service not configured. Reset link for {$toEmail}: {$resetLink}");
+                return true;
+            }
 
+            $this->mailer->clearAddresses();
+            $this->mailer->addAddress($toEmail, $toName);
+            $this->mailer->Subject = 'Reset Your Password - Aunt Joy Restaurant';
+            $this->mailer->Body = $this->getPasswordResetTemplate($toName, $resetLink);
+            $this->mailer->AltBody = strip_tags($this->mailer->Body);
+
+            if ($this->mailer->send()) {
+                $this->logger->info("✅ Password reset email sent to: {$toEmail}");
+                return true;
+            } else {
+                $this->logger->error("❌ Failed to send password reset email to: {$toEmail}");
+                return false;
+            }
+        } catch (Exception $e) {
+            $this->logger->error("Exception sending password reset email to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Password reset email template
+     */
+    private function getPasswordResetTemplate($name, $resetLink)
+    {
         return "
         <!DOCTYPE html>
         <html>
@@ -136,34 +167,96 @@ class EmailService
             <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
-                .credentials { background: #fff; padding: 15px; border-left: 4px solid #dc2626; margin: 15px 0; border-radius: 5px; }
-                .warning { background: #fef3c7; padding: 10px; border-radius: 5px; margin: 15px 0; }
+                .header { background: #0f766e; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                .button { display: inline-block; padding: 12px 30px; background: #0f766e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+                .footer { margin-top: 30px; font-size: 12px; color: #666; text-align: center; }
+                .warning { background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; }
             </style>
         </head>
         <body>
             <div class='container'>
                 <div class='header'>
                     <h1>🍽️ Aunt Joy Restaurant</h1>
-                    <h2>Your Account Credentials</h2>
+                    <h2>Password Reset Request</h2>
                 </div>
                 <div class='content'>
                     <p>Hello <strong>{$name}</strong>,</p>
-                    <p>Your {$role} account has been created successfully at Aunt Joy Restaurant.</p>
-
-                    <div class='credentials'>
-                        <p><strong>📧 Email:</strong> {$email}</p>
-                        <p><strong>🔑 Password:</strong> {$password}</p>
-                        <p><strong>👤 Role:</strong> " . ucfirst($role) . "</p>
+                    <p>We received a request to reset your password for your Aunt Joy Restaurant account.</p>
+                    
+                    <div style='text-align: center;'>
+                        <a href='{$resetLink}' class='button'>Reset Password</a>
                     </div>
-
+                    
                     <div class='warning'>
-                        <p><strong>⚠️ Important:</strong> For security reasons, please change your password immediately after logging in.</p>
+                        <p><strong>⚠️ This link will expire in 1 hour.</strong></p>
                     </div>
+                    
+                    <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
+                    
+                    <div class='footer'>
+                        <p>This is an automated message, please do not reply to this email.</p>
+                        <p>&copy; " . date('Y') . " Aunt Joy Restaurant. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+    }
 
-                    <p><strong>🔗 Login URL:</strong> <a href='{$appUrl}/login'>{$appUrl}/login</a></p>
-
+    /**
+     * Welcome email template for new users
+     */
+    private function getWelcomeEmailTemplate($name, $email, $password, $role, $loginUrl)
+    {
+        $roleDisplay = ucfirst($role);
+        
+        return "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #0f766e; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                .credentials { background: #fff; padding: 20px; border-left: 4px solid #0f766e; margin: 20px 0; border-radius: 5px; }
+                .warning { background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                .button { display: inline-block; padding: 12px 30px; background: #0f766e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>🍽️ Welcome to Aunt Joy Restaurant!</h1>
+                </div>
+                <div class='content'>
+                    <p>Hello <strong>{$name}</strong>,</p>
+                    <p>Your account has been created successfully as a <strong>{$roleDisplay}</strong>.</p>
+                    
+                    <div class='credentials'>
+                        <h3 style='margin-top: 0; color: #0f766e;'>Your Login Credentials:</h3>
+                        <p><strong>📧 Email:</strong> {$email}</p>
+                        <p><strong>🔑 Password:</strong> <span style='font-family: monospace; background: #f0f0f0; padding: 3px 6px; border-radius: 3px;'>{$password}</span></p>
+                        <p><strong>👤 Role:</strong> {$roleDisplay}</p>
+                    </div>
+                    
+                    <div style='text-align: center;'>
+                        <a href='{$loginUrl}' class='button'>Login to Your Account</a>
+                    </div>
+                    
+                    <div class='warning'>
+                        <p><strong>⚠️ Important Security Tips:</strong></p>
+                        <ul style='margin: 5px 0; padding-left: 20px;'>
+                            <li>Change your password immediately after first login</li>
+                            <li>Never share your password with anyone</li>
+                            <li>Use a strong, unique password</li>
+                        </ul>
+                    </div>
+                    
+                    <p>If you have any questions, please contact our support team.</p>
+                    
                     <p>Best regards,<br>The Aunt Joy Restaurant Team</p>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 /**
  * User Model - Handles all user-related database operations
  */
-require_once __DIR__ . '/../config/Database.php'; // FIXED: Use __DIR__
+require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/../utils/Logger.php';
 
 class User
@@ -18,7 +18,6 @@ class User
         $this->conn = $database->getConnection();
         $this->logger = new Logger();
     }
-
 
     /**
      * Find user by email
@@ -53,7 +52,7 @@ class User
     {
         try {
             $query = "SELECT id, name, email, role, phone, address, is_active, created_at
-                      FROM {$this->table} WHERE id = :id AND is_active = TRUE";
+                      FROM {$this->table} WHERE id = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
@@ -190,7 +189,7 @@ class User
     }
 
     /**
-     * activate user
+     * Activate user
      */
     public function activate($id)
     {
@@ -229,6 +228,107 @@ class User
             return $users;
         } catch (PDOException $e) {
             $this->logger->error("Error retrieving users by role {$role}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Save password reset token
+     */
+    public function saveResetToken($email, $token)
+    {
+        try {
+            $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            $query = "UPDATE {$this->table} 
+                      SET reset_token = :token, reset_expires = :expires 
+                      WHERE email = :email AND is_active = TRUE";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':token', $token);
+            $stmt->bindParam(':expires', $expires);
+            $stmt->bindParam(':email', $email);
+            
+            $result = $stmt->execute();
+            $this->logger->info("Reset token saved for email: {$email}");
+            return $result;
+        } catch (PDOException $e) {
+            $this->logger->error("Error saving reset token for {$email}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Find user by reset token
+     */
+    public function findByResetToken($token)
+    {
+        try {
+            $query = "SELECT * FROM {$this->table} 
+                      WHERE reset_token = :token 
+                      AND reset_expires > NOW() 
+                      AND is_active = TRUE";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':token', $token);
+            $stmt->execute();
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                $this->logger->debug("User found by reset token");
+            } else {
+                $this->logger->debug("No user found with valid reset token");
+            }
+            
+            return $user;
+        } catch (PDOException $e) {
+            $this->logger->error("Error finding user by reset token: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update password and clear reset token
+     */
+    public function updatePassword($userId, $newPassword)
+    {
+        try {
+            $query = "UPDATE {$this->table} 
+                      SET password = :password, 
+                          reset_token = NULL, 
+                          reset_expires = NULL 
+                      WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':password', $newPassword);
+            $stmt->bindParam(':id', $userId);
+            
+            $result = $stmt->execute();
+            $this->logger->info("Password updated for user ID: {$userId}");
+            return $result;
+        } catch (PDOException $e) {
+            $this->logger->error("Error updating password for user ID {$userId}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Clean expired reset tokens (cron job)
+     */
+    public function cleanExpiredTokens()
+    {
+        try {
+            $query = "UPDATE {$this->table} 
+                      SET reset_token = NULL, reset_expires = NULL 
+                      WHERE reset_expires < NOW()";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            
+            $count = $stmt->rowCount();
+            $this->logger->info("Cleaned {$count} expired reset tokens");
+            return $count;
+        } catch (PDOException $e) {
+            $this->logger->error("Error cleaning expired tokens: " . $e->getMessage());
             return false;
         }
     }
