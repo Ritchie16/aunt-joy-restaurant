@@ -8,11 +8,18 @@ import { resolveMediaUrl } from '../utils/media';
 // landing-specific styling & components
 import './LandingPage.css';
 import Footer from '../components/landing/Footer';
+import AboutSection from '../components/landing/AboutSection';
 
 const LandingPage = () => {
   const { isAuthenticated, user } = useAuth();
   const [meals, setMeals] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // derive filtered list when category changes
+  const filteredMeals = selectedCategory === 'all'
+    ? meals
+    : meals.filter(m => m.category_id === parseInt(selectedCategory));
 
   useEffect(() => {
     const loadPublicData = async () => {
@@ -101,7 +108,15 @@ const LandingPage = () => {
 
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <span key={category.id} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+              <span
+                key={category.id}
+                onClick={() => setSelectedCategory(String(category.id))}
+                className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors
+                  ${selectedCategory === String(category.id)
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}
+                `}
+              >
                 {category.name}
               </span>
             ))}
@@ -111,12 +126,14 @@ const LandingPage = () => {
         <section className="mt-8">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-xl font-semibold text-slate-900">Available Meals</h3>
-            <span className="text-sm text-slate-500">{meals.length} items</span>
+            <span className="text-sm text-slate-500">
+              {selectedCategory === 'all' ? meals.length : filteredMeals.length} items
+            </span>
           </div>
 
-          {meals.length > 0 ? (
+          {filteredMeals.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {meals.slice(0, 9).map((meal) => (
+              {filteredMeals.slice(0, 9).map((meal) => (
                 <article key={meal.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="h-40 bg-slate-100">
                     {meal.image_path ? (
@@ -142,7 +159,20 @@ const LandingPage = () => {
           )}
         </section>
       </main>
+      {/* about us section pulled from component */}
+      {/*<AboutSection /> */}
       {/* landing footer */}
+      {/* clear filter button if active */}
+      {selectedCategory !== 'all' && (
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className="text-sm text-emerald-600 hover:underline"
+          >
+            Show all meals
+          </button>
+        </div>
+      )}
       <Footer />
     </div>
   );
