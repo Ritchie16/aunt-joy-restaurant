@@ -224,6 +224,17 @@ const Login = () => {
                   'Sign in'
                 )}
               </button>
+              {/* Add this after the password field or before the submit button */}
+<div className="flex items-center justify-end">
+  <div className="text-sm">
+    <Link
+      to="/forgot-password"
+      className="font-medium text-primary-600 hover:text-primary-500"
+    >
+      Forgot your password?
+    </Link>
+  </div>
+</div>
             </div>
           </form>
 

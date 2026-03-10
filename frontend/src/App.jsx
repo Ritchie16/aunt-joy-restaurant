@@ -8,6 +8,8 @@ import LandingPage from './pages/LandingPage';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import SalesDashboard from './pages/SalesDashboard';
@@ -24,7 +26,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   if (!isAuthenticated) {
     Logger.warn('Access denied: User not authenticated');
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
@@ -86,17 +88,18 @@ function App() {
             <Routes>
               {/* Public Routes - Landing Page accessible to all */}
               <Route path="/" element={
-                <PublicRoute>
+                <PublicRoute allowAuthenticated={true}>
                   <LandingPage />
                 </PublicRoute>
               } />
               
               <Route path="/contact" element={
-                <PublicRoute>
+                <PublicRoute allowAuthenticated={true}>
                   <Contact />
                 </PublicRoute>
               } />
 
+              {/* Authentication Routes */}
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
@@ -106,6 +109,19 @@ function App() {
               <Route path="/register" element={
                 <PublicRoute>
                   <Register />
+                </PublicRoute>
+              } />
+
+              {/* Password Reset Routes - Public but with special handling */}
+              <Route path="/forgot-password" element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              } />
+              
+              <Route path="/reset-password" element={
+                <PublicRoute>
+                  <ResetPassword />
                 </PublicRoute>
               } />
 
@@ -128,6 +144,7 @@ function App() {
                       <Route path="cart" element={<CustomerDashboard />} />
                       <Route path="orders" element={<CustomerDashboard />} />
                       <Route path="checkout" element={<CustomerDashboard />} />
+                      <Route path="profile" element={<CustomerDashboard />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>
@@ -142,6 +159,7 @@ function App() {
                       <Route path="users" element={<AdminDashboard />} />
                       <Route path="meals" element={<AdminDashboard />} />
                       <Route path="reports" element={<AdminDashboard />} />
+                      <Route path="settings" element={<AdminDashboard />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>
@@ -155,6 +173,7 @@ function App() {
                       <Route index element={<SalesDashboard />} />
                       <Route path="orders" element={<SalesDashboard />} />
                       <Route path="customers" element={<SalesDashboard />} />
+                      <Route path="pos" element={<SalesDashboard />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>
@@ -169,6 +188,7 @@ function App() {
                       <Route path="reports" element={<ManagerDashboard />} />
                       <Route path="analytics" element={<ManagerDashboard />} />
                       <Route path="staff" element={<ManagerDashboard />} />
+                      <Route path="inventory" element={<ManagerDashboard />} />
                     </Routes>
                   </Layout>
                 </ProtectedRoute>
@@ -177,12 +197,17 @@ function App() {
               {/* Fallback Routes */}
               <Route path="/unauthorized" element={
                 <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Unauthorized Access</h1>
-                    <p className="text-gray-600">You don't have permission to access this page.</p>
+                  <div className="text-center max-w-md mx-auto p-6">
+                    <div className="bg-red-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl">🚫</span>
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Unauthorized Access</h1>
+                    <p className="text-gray-600 mb-6">
+                      You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+                    </p>
                     <button 
                       onClick={() => window.location.href = '/'}
-                      className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                      className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       Return to Home
                     </button>
@@ -192,12 +217,17 @@ function App() {
 
               <Route path="*" element={
                 <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Page Not Found</h1>
-                    <p className="text-gray-600">The page you're looking for doesn't exist.</p>
+                  <div className="text-center max-w-md mx-auto p-6">
+                    <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl">404</span>
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Page Not Found</h1>
+                    <p className="text-gray-600 mb-6">
+                      The page you're looking for doesn't exist or has been moved.
+                    </p>
                     <button 
                       onClick={() => window.location.href = '/'}
-                      className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                      className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       Go to Homepage
                     </button>

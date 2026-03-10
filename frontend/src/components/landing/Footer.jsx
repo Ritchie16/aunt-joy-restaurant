@@ -11,7 +11,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>Aunt Joy's Restaurant</h3>
+          <h3>🍽️ Aunt Joy's Restaurant</h3>
           <p>
             Serving authentic Malawian cuisine since 2020. 
             Our passion for traditional recipes and fresh ingredients 

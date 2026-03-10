@@ -467,7 +467,7 @@ const CustomerDashboard = () => {
         </div>
         <div className="flex items-center gap-3 text-sm text-gray-600">
           <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><MapPin className="h-4 w-4" /> Mzuzu</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><Phone className="h-4 w-4" /> +265 123 456 789</span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><Phone className="h-4 w-4" /> +265 (0) 999 467 324</span>
         </div>
       </div>
 
