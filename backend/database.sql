@@ -1,5 +1,4 @@
 -- Create database if it doesn't exist
---This is database.sql file at root dir in backend
 CREATE DATABASE IF NOT EXISTS aunt_joy_restaurant;
 USE aunt_joy_restaurant;
 

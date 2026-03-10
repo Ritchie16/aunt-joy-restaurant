@@ -1,4 +1,4 @@
-<?php
+controllers/mealcontroller.php => <?php
 
 /**
  * Meal Controller - Handles all meal-related operations
